@@ -1,0 +1,23 @@
+<script type="text/JavaScript">
+
+    // Retrieving estates.
+    //
+    function getEstates()
+    {
+        var request = new window.XMLHttpRequest();
+        request.open('GET', 'GetEstates');
+
+        request.onreadystatechange = function() {
+            if ((request.readyState == 4) &&
+                (request.status == 200)) 
+                {
+                    estates = JSON.parse(request.responseText);
+                }
+        };
+
+        request.send(null);
+    }
+
+</script>
+
+<p>ide jön az ingatlanok listája</p>

@@ -1,0 +1,226 @@
+<!-- Featured estate slider. -->
+<div class="container sample" id="example">
+    <div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
+
+        <ol class="carousel-indicators">
+            <li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
+            <li data-target="#carousel-example-generic" data-slide-to="1"></li>
+            <li data-target="#carousel-example-generic" data-slide-to="2"></li>
+        </ol>
+
+        <div class="carousel-inner" role="listbox">
+        
+            <div class="carousel-item active text-md-center">
+                <img src="~/res/5.jpeg" height="600px">
+                <div class="carousel-caption">
+                    dombtető villa
+                    <p>
+                        <a class="btn btn-primary btn-lg"
+                            href="#" role="button">
+                            Megnézem
+                        </a>
+                    </p>
+                </div>
+            </div>
+
+            <div class="carousel-item text-md-center">
+                <img src="~/res/5.jpeg" height="600px">
+                <div class="carousel-caption">
+                    ipari iroda
+                    <p>
+                        <a class="btn btn-primary btn-lg"
+                            href="#" role="button">
+                            Megnézem
+                        </a>
+                    </p>
+                </div>
+            </div>
+
+            <div class="carousel-item text-md-center">
+                <img src="~/res/5.jpeg" height="600px">
+                <div class="carousel-caption">
+                    baráti lakás
+                    <p>
+                        <a class="btn btn-primary btn-lg"
+                            href="#" role="button">
+                            Megnézem
+                        </a>
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+        <a class="left carousel-control" href="#carousel-example-generic" role="button" data-slide="prev">
+            <span class="fa fa-chevron-left" aria-hidden="true"></span>
+            <span class="sr-only">
+                Previous
+            </span>
+        </a>
+
+        <a class="right carousel-control" href="#carousel-example-generic" role="button" data-slide="next">
+            <span class="fa fa-chevron-right" aria-hidden="true"></span>
+            <span class="sr-only">
+                Next
+            </span>
+        </a>
+
+    </div>
+</div>
+
+<div class="row">&nbsp;</div>
+
+<!-- Simple search module. -->
+<div>
+    
+    <form>
+
+        <!-- Estate category picker. -->
+        <span class="form-group">
+
+            <label>Válasszon ingatlan típust</label>
+            <select class="form-control">
+                <option>Kertesház</option>
+                <option>Lakás</option>
+                <option>Telek</option>
+                <option>Iroda</option>
+            </select>
+
+        </span>
+
+        <div class="row">&nbsp;</div>
+
+        <!-- Minimum/maximum price. -->
+        <span class="form-group">
+
+            <label>Adja meg az értéktartományt (HUF)</label>
+            <input type="text" placeholder="Minimum" class="form-control"/>
+            <input type="text" placeholder="Maximum" class="form-control"/>
+
+        </span>
+
+        <div class="row">&nbsp;</div>
+
+        <!-- City. -->
+        <span class="form-group">
+
+            <label>Adja meg a települést</label>
+            <input type="text" placeholder="pld. Budapest" class="form-control"/>
+
+        </span>
+
+        <div class="row">&nbsp;</div>
+
+        <!-- Search. -->
+        <button class="btn btn-primary">Keresés indítása</button>
+        
+        <!-- Complex search. -->
+        <button class="btn btn-secondary ml-3">Részletes kereső</button>
+
+    </form>
+
+</div>
+
+<div class="row">&nbsp;</div>
+
+<!-- Ordering estate list. -->
+<div>
+
+    <div class="btn-toolbar" role="toolbar" aria-label="Toolbar">
+
+     <!-- Order by price. -->
+     <div class="btn-group" role="group">
+
+       <button type="button"
+               class="btn btn-secondary dropdown-toggle"
+               data-toggle="dropdown"
+               aria-haspopup="true"
+               aria-expanded="false">
+          Ár
+          <span class="caret"></span>
+       </button>
+
+       <div class="dropdown-menu">
+          <a class="dropdown-item" href="#">Legolcsóbb elöl</a>
+          <a class="dropdown-item" href="#">Legdrágább elöl</a>
+       </div>
+
+     </div>
+
+    <!-- Order by date of upload. -->
+     <div class="btn-group ml-3" role="group">
+
+       <button type="button"
+               class="btn btn-secondary dropdown-toggle"
+               data-toggle="dropdown"
+               aria-haspopup="true"
+               aria-expanded="false">
+          Feltöltési időpont
+          <span class="caret"></span>
+       </button>
+
+       <div class="dropdown-menu">
+          <a class="dropdown-item" href="#">Legújabb elöl</a>
+          <a class="dropdown-item" href="#">Legrégebbi elöl</a>
+       </div>
+
+     </div>
+
+     <!-- Show the most populars first. -->
+     <div class="btn-group" role="group">
+
+       <button class="btn btn-secondary ml-3">Legnépszerűbbek</button>
+
+     </div>
+
+   </div> <!-- btn-toolbar -->
+
+</div>
+
+
+<div class="row">&nbsp;</div>
+
+@for(int i = 0; i < 12; ++i)
+{
+    <!-- Estate list. -->
+    <div style="float: left;" class="ml-3 mb-3">
+        
+        <div class="card text-center" style="width: 350px">
+        
+            <!-- Thumbnail. -->
+            <img class="card-img-top" src="~/res/5.jpeg" alt="ingatlan">
+            
+            <div class="card-img-overlay card-inverse text-right">
+                
+                <!-- Offer type. -->
+                <p class="btn-primary btn-sm">
+                    KIADÓ
+                </p>
+
+            </div>
+            
+            <div class="card-block">
+
+                <!-- Advertisement title. -->
+                <h3 class="card-title">
+                    Eladó lakás a dombon
+                </h3>
+
+                <!-- Price. -->
+                <div>
+                    123456 Ft
+                </div>
+
+                <!-- Basic info. -->
+                <div>
+                    3 szobás, gázfűtéses, 96 m^2 alapterületű
+                </div>
+
+                <div>
+                </div>
+            </div>
+
+    </div>
+
+    </div>
+}

@@ -1,0 +1,86 @@
+<form class="container mt-4">
+
+    <div class="row">
+        <!-- Ingatlan-kategória kiválasztása. -->
+        <div class="col">
+            <span class="form-group">
+
+                <label class="font-weight-bold">Ingatlan Típus</label>
+
+                <select class="form-control">
+                    <option>Kertesház</option>
+                    <option>Lakás</option>
+                    <option>Telek</option>
+                    <option>Iroda</option>
+                </select>
+
+            </span>
+        </div>
+
+        <!-- Minimum/maximum ár. -->
+        <div class="col">
+            <span class="form-group">
+
+                <label class="font-weight-bold">Értéktartomány (HUF)</label>
+                
+                <div class="container">
+                        <div>
+                            <input type="text" placeholder="Minimum" class="form-control"/>
+                        </div>
+                        <div>
+                            <input type="text" placeholder="Maximum" class="form-control"/>
+                        </div>
+                </div>
+
+            </span>
+        </div>
+
+        <!-- Város kiválasztása. -->
+        <div class="col">
+            <span class="form-group">
+
+                <div>
+                    <label class="font-weight-bold">Település</label>
+                    <input type="text" placeholder="pld. Siófok" class="form-control"/>
+                </div>
+
+            </span>
+        </div>
+
+    </div>
+
+    <div id="search-buttons" class="mt-4 row">
+        
+        <div class="col"></div>
+        <div class="col"></div>
+
+            <!-- Keresés. -->
+        <span class="col">
+
+            <button id="start-simple-search" class="btn btn-primary float-right start-search">
+
+                <span class="fas fa-search"></span>
+                &nbsp;
+                Keresés Indítása&nbsp;&nbsp;
+
+            </button>
+
+        </span>
+        
+        <!-- Összetett keresés. -->
+        <span class="col">
+            
+            <button id="advanced-search"
+                    class="btn btn-secondary float-right mr-3">
+
+                <span class="fas fa-list"></span>
+                &nbsp;
+                Részletes Kereső
+
+            </button>
+
+        </span>
+
+    </div>
+
+</form>

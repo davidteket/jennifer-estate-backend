@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        
+        <title>
+            Kezdőoldal
+        </title>
+
+        <!-- site/css -->
+        <link rel="stylesheet" href="site/css/style.css"/>
+
+        <!-- lib/css -->
+        <link rel="stylesheet" href="lib/bootstrap.css"/>
+        <link rel="stylesheet" href="lib/hover.css"/>
+        <link rel="stylesheet" href="lib/fontawesome/css/all.css"/>
+
+        <!-- lib/js -->
+        <script src="lib/jquery.js"></script>
+
+    </head>
+
+    <body class="container">
+
+            <div id="main-content">
+
+                    <div id="login-strip"></div>
+                    <div id="menu-strip"></div>
+                    <div id="image-slider"></div>
+                    <div id="search-module"></div>
+                    <div id="advanced-search-container"></div>
+                    <div id="estate-lister"></div>
+                    <div id="employee-lister"></div>
+                    <div id="footer-strip"></div>
+                    
+            </div>
+
+        <script>
+
+            function loadSharedResources() 
+            {
+                
+                $("#menu-strip").load("site/shared/menu_strip.html");
+            }
+
+            function loadResources()
+            {
+                loadSharedResources();
+                
+                $("#jennifer-estate-app").load("site/main.html");
+
+                $("#image-slider").load("site/shared/image_slider.html");
+                $("#search-module").load("site/shared/search_module.html");
+                $("#estate-lister").load("site/shared/estate_lister.html");
+                $("#employee-lister").load("site/shared/employee_lister.html");
+            }
+
+            document.onload = loadResources();
+
+
+        </script>
+
+    </body>
+
+    <script src="site/js/script.js"></script>
+    <script src="lib/bootstrap.js"></script>
+
+</html>
