@@ -102,7 +102,7 @@ namespace backend
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
 
             // Front-end elérés biztosítása.
             //
