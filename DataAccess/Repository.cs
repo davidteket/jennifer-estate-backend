@@ -335,6 +335,13 @@ namespace backend.DataAccess
             return success;
         }
 
+        public void AddInvitation(string inviteeId) 
+        {
+            var inv = new Invitation();
+            ctx.Invitation.Add(inv);
+            ctx.SaveChanges();
+        }
+
         public bool DeleteEmployee(string employeeId)
         {
             bool success = false;

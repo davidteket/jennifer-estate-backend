@@ -51,6 +51,7 @@ namespace backend.DataAccess
         void AddPublicService(PublicService publicService, int estateId);
         void AddWaterSystem(WaterSystem waterSystem, int estateId);
         void AddAdvertisement(Advertisement advertisement, int estateId, string advertiserId);
+        void AddInvitation(string inviteeId);
 
         #endregion
         #region DELETE

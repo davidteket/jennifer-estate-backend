@@ -9,6 +9,7 @@ namespace backend.DataAccess.Entities
         public Invitation()
         {
             this.Id = System.Guid.NewGuid().ToString();
+            this.Expired = 0;
         }
     }
 }

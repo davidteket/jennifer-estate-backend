@@ -8,6 +8,9 @@
             Kezdőoldal
         </title>
 
+        <!-- fonts -->
+        <link href="https://fonts.googleapis.com/css?family=Comfortaa&display=swap" rel="stylesheet">
+
         <!-- site/css -->
         <link rel="stylesheet" href="site/css/style.css"/>
 
@@ -21,45 +24,20 @@
 
     </head>
 
-    <body class="container">
+    <body class="container site-background">
 
-            <div id="main-content">
-
-                    <div id="login-strip"></div>
+            <div id="contents">
+                
                     <div id="menu-strip"></div>
                     <div id="image-slider"></div>
                     <div id="search-module"></div>
                     <div id="advanced-search-container"></div>
+                    <div id="login-strip"></div>
                     <div id="estate-lister"></div>
                     <div id="employee-lister"></div>
                     <div id="footer-strip"></div>
                     
             </div>
-
-        <script>
-
-            function loadSharedResources() 
-            {
-                
-                $("#menu-strip").load("site/shared/menu_strip.html");
-            }
-
-            function loadResources()
-            {
-                loadSharedResources();
-                
-                $("#jennifer-estate-app").load("site/main.html");
-
-                $("#image-slider").load("site/shared/image_slider.html");
-                $("#search-module").load("site/shared/search_module.html");
-                $("#estate-lister").load("site/shared/estate_lister.html");
-                $("#employee-lister").load("site/shared/employee_lister.html");
-            }
-
-            document.onload = loadResources();
-
-
-        </script>
 
     </body>
 

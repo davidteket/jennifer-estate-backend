@@ -27,9 +27,9 @@ namespace backend
         public static SignInManager<User> SignInManager;
         public static RoleManager<UserRole> RoleManager;
 
-        public static class Email { // TODO
-            public static string Host { get; set; }
-            public static int Port { get; set; }
+        public static class Email { 
+            public static string Host = "smtp.gmail.com";
+            public static int Port = 587;
         }
 
 

@@ -1,23 +1,72 @@
+<div class="mt-4">&nbsp;</div>
 <!-- Részletes keresés. -->
-<div id="advanced-search-template" class="container mt-3">
+<div id="advanced-search-template" class="container mt-4 p-4 site-overlayitem">
 
     <span class="form-group">
 
         <div class="row">
+                <!-- Ingatlan-kategória kiválasztása. -->
+                <div class="col">
+                        <span class="form-group">
+        
+                        <label class="font-weight-bold">Ingatlan Típus</label>
+        
+                        <select class="form-control">
+                                <option>Kertesház</option>
+                                <option>Lakás</option>
+                                <option>Telek</option>
+                                <option>Iroda</option>
+                        </select>
+        
+                        </span>
+                </div>
+        
+                <!-- Minimum/maximum ár. -->
+                <div class="col">
+                        <span class="form-group">
+        
+                        <div class="container">
+                                <label class="font-weight-bold">Értéktartomány (HUF)</label>
+                                <div>
+                                        <input type="text" placeholder="-tól" class="form-control"/>
+                                </div>
+                                <div class="mt-1">
+                                        <input type="text" placeholder="-ig" class="form-control"/>
+                                </div>
+                        </div>
+        
+                        </span>
+                </div>
+        
+                <!-- Város kiválasztása. -->
+                <div class="col">
+                        <span class="form-group">
+        
+                        <div>
+                                <label class="font-weight-bold">Település</label>
+                                <input type="text" placeholder="pld. Siófok" class="form-control"/>
+                        </div>
+        
+                        </span>
+                </div>
+        
+        </div>
 
-            <div class="col">
+        <div class="row mt-5">
+
+            <div class="col mb-3">
 
                 <label class="font-weight-bold">Négyzetméter</label>
                 <input type="text" placeholder="-tól" class="form-control"/>
-                <input type="text" placeholder="-ig" class="form-control"/>
+                <input type="text" placeholder="-ig" class="form-control mt-1"/>
 
             </div>
 
-            <div class="col">
+            <div class="col mb-3">
 
                 <label class="font-weight-bold">Építés Éve</label>
                 <input type="text" placeholder="-tól" class="form-control"/>
-                <input type="text" placeholder="-ig" class="form-control"/>
+                <input type="text" placeholder="-ig" class="form-control mt-1"/>
 
             </div>
 
@@ -49,28 +98,28 @@
 
         <div class="row mt-3">
 
-                <div class="col">
+                <div class="col mb-3">
     
                     <label class="font-weight-bold">Szoba</label>
                     <input type="text" placeholder="pld.: 3" class="form-control"/>
     
                 </div>
     
-                <div class="col">
+                <div class="col mb-3">
     
                     <label class="font-weight-bold">Konyha</label>
                     <input type="text" placeholder="pld.: 1" class="form-control"/>
     
                 </div>
     
-                <div class="col">
+                <div class="col mb-3">
     
                     <label class="font-weight-bold">Fürdőszoba</label>
                     <input type="text" placeholder="pld.: 1" class="form-control"/>
     
                 </div>
     
-                <div class="col">
+                <div class="col mb-3">
     
                     <label class="font-weight-bold">Szintek</label>
                     <input type="text" placeholder="pld.: 2" class="form-control"/>
@@ -78,175 +127,60 @@
                 </div>
     
     
-            </div>
+        </div>
         
         <div class="row mt-3">
+                <div class="col tags">
+                
+                        <span class="tag p-2 m-1 hvr-grow">Felújított</span>
+                        <span class="tag p-2 m-1 hvr-grow">Garázs</span>
+                        <span class="tag p-2 m-1 hvr-grow">Lift</span>
+                        <span class="tag p-2 m-1 hvr-grow">Kert</span>
+                        <span class="tag p-2 m-1 hvr-grow">Terasz</span>
 
-            <div class="col">
-
-                <label for="renewed" class="form-check-label font-weight-bold">Felújított</label>
-                <input id="renewed" class="form-check-input ml-2" type="checkbox">
-
-            </div>
-
-            <div class="col">
-
-                    <label for="garage" class="form-check-label font-weight-bold">Garázs</label>
-                    <input id="garage" class="form-check-input ml-2" type="checkbox">
-
-            </div>
-
-            <div class="col">
-
-                    <label for="lift" class="form-check-label font-weight-bold">Lift</label>
-                    <input id="lift" class="form-check-input ml-2" type="checkbox">
-
-            </div>
-
-            <div class="col">
-
-                    <label for="garden" class="form-check-label font-weight-bold">Kert</label>
-                    <input id="garden" class="form-check-input ml-2" type="checkbox">
-
-            </div>
-
-            <div class="col">
-
-                    <label for="terrace" class="form-check-label font-weight-bold">Terasz</label>
-                    <input id="terrace" class="form-check-input ml-2" type="checkbox">
-
-            </div>
-
-            <div class="col">
-
-                    <label for="basement" class="form-check-label font-weight-bold">Pince</label>
-                    <input id="basement" class="form-check-input ml-2" type="checkbox">
-
-            </div>
-        
-        </div>
-
-
+                </div>  
+        </div>      
         <div class="row mt-3">
+                <div class="col tags">
 
-                <div class="col">
+                        <span class="tag p-2 m-1 hvr-grow">Pince</span>
+                        <span class="tag p-2 m-1 hvr-grow">Napkollektor</span>
+                        <span class="tag p-2 m-1 hvr-grow">Hálózati Fűtés</span>
+                        <span class="tag p-2 m-1 hvr-grow">Fatüzelésű</span>
+                        <span class="tag p-2 m-1 hvr-grow">Pince</span>
 
-                        <label for="suncollector" class="form-check-label font-weight-bold">Napkollektoros</label>
-                        <input id="suncollector" class="form-check-input ml-2" type="checkbox">
-        
                 </div>
-    
-                <div class="col">
-    
-                        <label for="networked" class="form-check-label font-weight-bold">Hálózati Fűtés</label>
-                        <input id="networked" class="form-check-input ml-2" type="checkbox">
-    
-                </div>
-
-                <div class="col">
-
-                        <label for="wood" class="form-check-label font-weight-bold">Fatüzelésű</label>
-                        <input id="wood" class="form-check-input ml-2" type="checkbox">
-        
-                </div>
-    
-                <div class="col">
-    
-                        <label for="remote" class="form-check-label font-weight-bold">Távfűtéses</label>
-                        <input id="remote" class="form-check-input ml-2" type="checkbox">
-    
-                </div>
-    
-                <div class="col">
-    
-                        <label for="gas" class="form-check-label font-weight-bold">Gázfűtéses</label>
-                        <input id="gas" class="form-check-input ml-2" type="checkbox">
-    
-                </div>
-    
-                <div class="col">
-    
-                        <label for="electricity" class="form-check-label font-weight-bold">Villamos Fűtés</label>
-                        <input id="electricity" class="form-check-input ml-2" type="checkbox">
-    
-                </div>
-
-    
         </div>
-
         <div class="row mt-3">
+                <div class="col tags">
 
-                <div class="col">
-    
-                        <label for="floor" class="form-check-label font-weight-bold">Padlófűtéses</label>
-                        <input id="floor" class="form-check-input ml-2" type="checkbox">
-    
+                        <span class="tag p-2 m-1 hvr-grow">Pince</span>
+                        <span class="tag p-2 m-1 hvr-grow">Távfűtéses</span>
+                        <span class="tag p-2 m-1 hvr-grow">Gázfűtéses</span>
+                        <span class="tag p-2 m-1 hvr-grow">Villamos Fűtés</span>
+                        <span class="tag p-2 m-1 hvr-grow">Padlófűtéses</span>
                 </div>
-
-
-                <div class="col">
-
-                        <label for="grocery" class="form-check-label font-weight-bold">Áruház</label>
-                        <input id="grocery" class="form-check-input ml-2" type="checkbox">
-        
-                </div>
-    
-                <div class="col">
-    
-                        <label for="gasstation" class="form-check-label font-weight-bold">Benzinkút</label>
-                        <input id="gasstation" class="form-check-input ml-2" type="checkbox">
-    
-                </div>
-
-                <div class="col">
-
-                        <label for="transport" class="form-check-label font-weight-bold">Tömegközlekedés</label>
-                        <input id="transport" class="form-check-input ml-2" type="checkbox">
-        
-                </div>
-    
-                <div class="col">
-    
-                        <label for="drugstore" class="form-check-label font-weight-bold">Gyógyszertár</label>
-                        <input id="drugstore" class="form-check-input ml-2" type="checkbox">
-    
-                </div>
-
         </div>
-
         <div class="row mt-3">
+                <div class="col tags">
 
-                <div class="col">
-    
-                        <label for="school" class="form-check-label font-weight-bold">Iskola</label>
-                        <input id="school" class="form-check-input ml-2" type="checkbox">
-    
+                <span class="tag p-2 m-1 hvr-grow">Áruház</span>
+                <span class="tag p-2 m-1 hvr-grow">Benzinkút</span>
+                <span class="tag p-2 m-1 hvr-grow">Tömegközlekedés</span>
+                <span class="tag p-2 m-1 hvr-grow">Gyógyszertár</span>
+                <span class="tag p-2 m-1 hvr-grow">Iskola</span>
+                <span class="tag p-2 m-1 hvr-grow">Posta</span>
+                <span class="tag p-2 m-1 hvr-grow">Bank</span>
+
                 </div>
-    
-                <div class="col">
-    
-                        <label for="maildepot" class="form-check-label font-weight-bold">Posta</label>
-                        <input id="maildepot" class="form-check-input ml-2" type="checkbox">
-    
-                </div>
-
-                <div class="col">
-    
-                        <label for="bank" class="form-check-label font-weight-bold">Bank</label>
-                        <input id="bank" class="form-check-input ml-2" type="checkbox">
-    
-                </div>
-
-                <!-- kórház, közbiztonság stb. -->
-
         </div>
-
+        
         <div class="row mt-4">
 
                
                 <div class="col">
                 
-                        <button id="start-advanced-search" class="btn btn-primary float-right mr-3">
+                        <button id="start-advanced-search" class="btn btn-primary float-right mr-3 hvr-grow">
                     
                                 <span class="fas fa-search"></span>
                                 &nbsp;

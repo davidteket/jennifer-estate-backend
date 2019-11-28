@@ -145,6 +145,7 @@ namespace backend.Controllers
             int length = (int) HttpContext.Request.ContentLength;
             byte[] buffer = new byte[length];
             var bufferTask = HttpContext.Request.Body.ReadAsync(buffer, 0, length);
+            bufferTask.Wait();
             string data = null;
 
             RegistrationViewModel registration = null;
@@ -154,11 +155,11 @@ namespace backend.Controllers
                 data = System.Text.Encoding.Default.GetString(buffer);
                 registration = (RegistrationViewModel) JsonConvert.DeserializeObject(data, typeof(RegistrationViewModel));
 
-                bool hasBeenInvited = repo.CheckInvitationStatus(registration.Invitation);
+                /*bool hasBeenInvited = repo.CheckInvitationStatus(registration.Invitation);
                 if (hasBeenInvited == false) {
                     response.Message = "Az oldalra csak meghívással lehet regisztrálni. A megadott meghívó azonosító érvénytelen.";
                     goto cancelRegistration;
-                }
+                }*/
             }
 
             var createUserTask = Startup.UserManager
@@ -194,11 +195,11 @@ namespace backend.Controllers
 
                     }
 
-                    repo.InvalidateInvitationTicket(registration.Invitation.Id);
+                    //repo.InvalidateInvitationTicket(registration.Invitation.Id);
                 }
             }
 
-            cancelRegistration:
+            //cancelRegistration:
             return JsonConvert.SerializeObject(response);
         }
 
@@ -332,13 +333,13 @@ namespace backend.Controllers
 
         [HttpPost]
         // Meghívó küldés regisztrációhoz.
-        public string SendInvitation()
+        public string SendInvitation(string inviteeId, string destination)
         {
             string response = null;
 
-            string destination = null; // TODO
-
             var client = new SmtpClient(Startup.Email.Host, Startup.Email.Port);
+            client.EnableSsl = true;
+        
             var company = repo.GetCompanyDetails();
 
             // TODO:
@@ -352,8 +353,11 @@ namespace backend.Controllers
             var emailSenderTask = client.SendMailAsync(message);
             emailSenderTask.Wait();
 
-            if (emailSenderTask.IsCompletedSuccessfully)
+            if (emailSenderTask.IsCompletedSuccessfully) 
+            {
                 response = "A meghívó elküldése sikeres volt.";
+                repo.AddInvitation(inviteeId);
+            }
             else
                 response = "Nem sikerült elküldeni a meghívót.";
 
