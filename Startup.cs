@@ -19,8 +19,8 @@ namespace backend
     {
         public IConfiguration Configuration { get; }
 
-        //private static readonly string developerConnectionString = "Server=tcp:jennifer-estate.database.windows.net,1433;Initial Catalog=jennifer-prod-db;Persist Security Info=False;User ID=caribou;Password=R2398qg#AGc%;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
-        private static readonly string developerConnectionString = "Server=localhost;Database=JenniferEstate;User Id=SA;Password=valami888__;";
+        private static readonly string developerConnectionString = "Server=tcp:dunakanyarhouse-prod-db.database.windows.net,1433;Initial Catalog=dunakanyarhouse-prod-db;Persist Security Info=False;User ID=caribou;Password={your_password};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
+        //private static readonly string developerConnectionString = "Server=localhost;Database=JenniferEstate;User Id=SA;Password=valami888__;";
         private static readonly string clientSideHostDirectoryName = "frontend";
         public static DbContextOptionsBuilder ctxOptionsBuilder => new DbContextOptionsBuilder()
                                                                 .UseSqlServer(developerConnectionString, null);
