@@ -103,20 +103,7 @@ namespace backend
                 app.UseDeveloperExceptionPage();
             }
 
-            //app.UseHttpsRedirection();
-
-            // Front-end elérés biztosítása.
-            //
-            string frontEnd = String.Concat(System.IO.Directory.GetParent(env.ContentRootPath).FullName,
-                                       System.IO.Path.DirectorySeparatorChar,
-                                       clientSideHostDirectoryName);
-
-            app.UseDefaultFiles(frontEnd);
-            app.UseStaticFiles(new StaticFileOptions() {
-                FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(
-                    System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "Client")),
-                    RequestPath = "/app"
-            });
+            app.UseStaticFiles();
 
             app.UseCookiePolicy();
 
