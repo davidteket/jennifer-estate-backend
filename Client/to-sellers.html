@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        
+        <title>
+            Eladóknak - Dunakanyar House Ingatlan
+        </title>
+
+        <!-- fonts -->
+        <link href="https://fonts.googleapis.com/css?family=Comfortaa&display=swap" rel="stylesheet">
+
+        <!-- site/css -->
+        <link rel="stylesheet" href="site/css/style.css"/>
+
+        <!-- lib/css -->
+        <link rel="stylesheet" href="lib/bootstrap.css"/>
+        <link rel="stylesheet" href="lib/hover.css"/>
+        <link rel="stylesheet" href="lib/fontawesome/css/all.css"/>
+
+        <!-- lib/js -->
+        <script src="lib/jquery.js"></script>
+        
+
+    </head>
+
+    <body class="container site-background">
+
+            <div id="contents">
+                
+                    <div id="menu-strip"></div>
+                    <div id="login-strip"></div>
+
+                    <!-- Fejléc. -->
+                    <div class='row site-overlayitem mt-2 m-1 p-3'>
+
+                        <div class='col pt-2'>
+
+                            <h4 class='text-center'>
+                                SIKERES ÉS GYORS ÉRTÉKESÍTÉS AZ ELÉRHETŐ LEGMAGASABB ÁRON. 
+                            </h4>
+
+                            <div>
+                                    <hr class="site-ruler-dotted"/>
+                            </div>
+
+                            <!-- Leírás. -->
+                            <p>
+                                Akik eldöntik, hogy eladják az otthonukat, vagy új otthont vásárolnak, azok számára ez izgalmas kihívás. 
+                                <br/>
+                                <br/>
+                                Megható látni adásvételi szerződéskötéskor az ügyfelek arcát, amikor rájönnek, ez most valóban megtörténik. Elérkeztek életük új szakaszához. 
+                                Egy ingatlan eladása komoly döntés, amelyet átgondoltam kell meghozni.
+                                <br/>
+                                <br/>
+                                Mi ingatlanközvetítők abban tudunk segíteni, hogy minél jobb feltételekkel tudja Ön eladni az ingatlanát és hogy biztosan meg is kapja a kialkudott összeget. 
+                                <br/>
+                                Levesszük válláról az eladás összes terhét: felkészítjük ingatlanát a hirdetésre, meghirdetjük az ingatlant és megszervezzük a potenciális vevők látogatását, képviseljük az érdekeit, segítünk a szerződéskötésben és az eladás után sem engedjük el a kezét, kérdéseivel továbbra is fordulhat hozzánk.
+                                <br/>
+                                <br/>
+                                Az ingatlanközvetítés egy szakma, mi azért vagyunk, hogy se az eladót, se a vevőt ne érjék kellemetlen meglepetések. A Dunakanyar House Ingatlaniroda a garancia arra, hogy az ingatlaneladás jó élmény. Ezért térnek hozzánk vissza a vevők, ezért választanak minket akár eladnak, akár álmaik új otthonát keresik.
+                            </p>
+
+                            <div>
+                                    <hr class="site-ruler-dotted"/>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Eladóknak gomb. -->
+                    <div class="row">
+
+                        <div class="col">&nbsp;</div>
+                        <div class="tag p-3 hvr-grow site-link-pointer col text-center mt-2 mb-2"
+                             data-toggle="modal"
+                             data-target="#sell-estate-modal">
+                                Eladó Ingatlanom Van
+                        </div>
+                        <div class="col">&nbsp;</div>
+                                
+                    </div>
+
+                    <div id="footer-strip"></div>
+
+                    <!-- Eladóknak ablak. -->
+                    <div class="modal fade" id="sell-estate-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+
+                        <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+
+                                        <div class="modal-header">
+
+                                                <h5 class="modal-title" id="exampleModalLabel">
+                                                        Eladóknak - Kapcsolatfelvétel
+                                                </h5>
+
+                                                <button type="button" id='close-sell-estate-modal' class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                </button>
+
+                                        </div>
+
+                                        <div class="modal-body">
+
+                                                <div class="form-group">
+
+                                                        <div class="mt-4">
+                                                                <label for="cust-name">Név:&nbsp;</label>
+                                                                <input type="text" id="cust-name" placeholder="pl. Piros Alma" class="form-control"/>
+                                                        </div>
+
+                                                        <div class="mt-4">
+                                                                 <label for="cust-email">Email Cím:&nbsp;</label>
+                                                                 <input type="text" id="cust-email" placeholder="pl. valaki@gmail.com" class="form-control"/>
+                                                        </div>
+
+                                                        <div class="mt-4">
+                                                                 <label for="cust-phone">Telefonszám:&nbsp;</label>
+                                                                 <input type="text" id="cust-phone" placeholder="pl. +36 70 123 4567" class="form-control"/>
+                                                        </div>
+
+                                                        <div class="mt-4">
+                                                                 <label for="cust-message">Üzenet:&nbsp;</label>
+                                                                 <textarea id="cust-message" class="form-control" placeholder="leírás..."></textarea>
+                                                        </div>
+
+                                                        <div class='text-center mt-2'>
+
+                                                                <span class="tag p-2 m-1 hvr-grow" id="reason-sell-request" value="0">
+                                                                    Értékesíteni Szeretném
+                                                                </span>
+
+                                                        </div>
+
+                                                        <div class='text-center mt-2'>
+
+                                                                <span class="tag p-2 m-1 hvr-grow" id="reason-photo-request" value="0">
+                                                                    Fotóztatni Szeretném
+                                                                </span>
+
+                                                        </div>
+
+                                                        <div class='text-center mt-2'>
+
+                                                                <span class="tag p-2 m-1 hvr-grow" id="reason-pricecheck-request" value="0">
+                                                                    Árelemzést Szeretnék
+                                                                </span>
+
+                                                        </div>
+
+                                                        <div class='text-center mt-2'>
+
+                                                                <span class="tag p-2 m-1 hvr-grow" id="reason-advice-request" value="0">
+                                                                    Tanácsot Kérnék
+                                                                </span>
+
+                                                        </div>
+
+                                                        
+                                                </div>
+
+                                        </div>
+
+                                        <div class="modal-footer">
+
+                                                <div class="container">
+                                                        <div class="row">
+                                                                
+                                                                <span class="col">&nbsp;</span>
+
+                                                                <span class="col">
+                                                                        <button id="send-seller-request-btn"
+                                                                                type="button" 
+                                                                                class="btn btn-primary hvr-grow">
+                                                                                <span class="fa fa-mail-bulk"></span>
+                                                                                &nbsp;
+                                                                                Küldés
+                                                                        </button>
+                                                                </span>
+
+                                                                <span class="col">&nbsp;</span>
+                                                        </div>
+                                                </div>
+
+                                        </div>
+        
+                                </div>
+                        </div>
+
+                </div>
+                    
+            </div>
+
+    </body>
+
+    <!-- post procesing -->
+    <script src="site/js/script.js"></script>
+    <script src="lib/bootstrap.js"></script>
+
+</html>

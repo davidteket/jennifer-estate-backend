@@ -1,0 +1,110 @@
+<div id="page-footer" class="mt-3 site-overlayitem">
+
+        <div class="container">
+                <div class="row p-2">
+
+                        <span class="small col pb-2 pt-2">
+                                <span class="fas fa-phone"></span>
+                                &nbsp;
+                                +36 30 296-5165&nbsp;|&nbsp;+36 30 296-5366
+                        </span>
+
+                        <span class="small col pb-2 pt-2">
+                                <span class="fas fa-map-marked"></span>
+                                &nbsp;
+                                2600, Vác, Káptalan utca 7 
+                        </span>
+
+                        <span class="small col pb-2 pt-2">
+                                <span class="fas fa-envelope"></span>
+                                &nbsp;
+                                info@dunakanyarhouse.hu
+                        </span>
+
+                        <!-- Bejelentkezés ablak. -->
+                        <div class="modal fade" id="login-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+
+                                <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+
+                                                <div class="modal-header">
+
+                                                        <h5 class="modal-title" id="exampleModalLabel">
+                                                                Munkatárs Beléptető Felület
+                                                        </h5>
+
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                <span aria-hidden="true">&times;</span>
+                                                        </button>
+
+                                                </div>
+
+                                                <div class="modal-body">
+
+                                                        <div class="form-group">
+
+                                                                <div class="mt-4">
+                                                                        <label for="username">Felhasználói Név:&nbsp;</label>
+                                                                        <input type="text" id="username" placeholder="valaki@teszt.hu" class="form-control"/>
+                                                                </div>
+
+                                                                <div class="mt-4">
+                                                                        <label for="password">Jelszó:&nbsp;</label>
+                                                                        <input type="password" id="password" class="form-control"/>
+                                                                </div>
+                                                                
+                                                        </div>
+
+                                                        <div class="alert alert-danger text-center" id="invalid-credentials-login">
+                                                                
+                                                                <br/>
+                                                                Hibás felhasználói név vagy jelszó.
+                                                                <br/>
+
+                                                        </div>
+
+                                                </div>
+
+                                                <div class="modal-footer">
+
+                                                        <div class="container">
+                                                                <div class="row">
+                                                                        
+                                                                        <span class="col">&nbsp;</span>
+
+                                                                        <span class="col">
+                                                                                <button id="login-btn"
+                                                                                        type="button" 
+                                                                                        class="btn btn-primary hvr-grow">
+                                                                                        <span class="fa fa-sign-in-alt"></span>
+                                                                                        &nbsp;
+                                                                                        Bejelentkezés
+                                                                                </button>
+                                                                        </span>
+
+                                                                        <span class="col">&nbsp;</span>
+                                                                </div>
+                                                        </div>
+
+                                                </div>
+                
+                                        </div>
+                                </div>
+
+                        </div>
+
+                        <span   id="login-modal-popup"
+                                class="small col site-link-pointer hvr-underline-from-center pb-2 pt-2"
+                                data-toggle="modal"
+                                data-target="#login-modal">
+                                <span class="fas fa-lock"></span>
+                                &nbsp;
+                                Bejelentkezés
+                        </span>
+                        
+
+                </div>
+
+        </div>
+                
+</div>

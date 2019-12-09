@@ -1,0 +1,111 @@
+body {
+    font-family: 'Comfortaa', cursive !important;
+    color: rgb(60, 60, 60) !important;
+    padding-top: 120px; /* navbar takarás miatt - lásd bootstrap doksi */
+}
+
+.site-background {
+    background: #ffffff;
+    background: rgb(52,58,64);
+    background: linear-gradient(90deg, rgba(52,58,64,1) 0%, rgba(186,186,186,1) 50%, rgba(52,58,64,1) 100%);
+}
+
+.site-overlayitem {
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 1em;
+}
+
+.site-overlayitem #footer-strip {
+    background: rgba(60, 60,60, 0.5);
+    color: rgba(255, 255, 255, 1.0);
+}
+
+.site-cursor-pointer {
+    cursor: default;
+}
+
+.site-link-pointer {
+    cursor: pointer;
+}
+
+.site-opaque-image-title {
+    color: rgba(255, 255, 255, 1.0);
+    background-color: rgba(60, 60, 60, 0.8);
+    font-weight: 800;
+    font-size: medium;
+}
+
+.tags {
+    list-style: none;
+    text-decoration: none;
+    margin: 0;
+    overflow: hidden; 
+    padding: 0;
+    cursor: pointer;
+  }
+  
+  .tags li {
+    float: left; 
+  }
+  
+
+.tag {
+  background: rgb(60, 60, 60);
+  border-radius: 3em;
+  color: #fff;
+  text-decoration: none;
+  -webkit-transition: color 0.2s;
+}
+
+
+.tag:hover {
+  background-color: crimson;
+  color: white;
+}
+
+.tag-clicked {
+  background-color: crimson;
+  color: white;
+}
+
+.tag:hover::after {
+   border-left-color: crimson; 
+}
+
+::selection {
+  color: white;
+  background-color: crimson;
+}
+
+.inputfile {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+}
+
+.site-dropactive-zone {
+  background-color: crimson !important;
+  color: #fff !important;
+}
+
+#image-upload-dropzone:hover {
+  background-color: crimson !important;
+  color: #fff !important;
+}
+
+table {
+  border-bottom-left-radius: 10px !important;
+  border-bottom-right-radius: 10px !important;
+}
+
+.site-estate-data-point-description {
+  color: #fff;
+  font-weight: 700;
+}
+
+.site-ruler-dotted {
+  border-top: 3px dotted grey;
+}

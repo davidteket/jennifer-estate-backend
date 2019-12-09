@@ -17,30 +17,83 @@ namespace backend.DataAccess
         }
 
         public List<Address> GetAddresses() => ctx.Address.ToList();
-        public Address GetAddress(int estateId) => ctx.Address.Select(address => address)
-                                                              .Where(address => address.EstateId == estateId)
-                                                              .First();
-        public List<Advertisement> GetAdvertisements() => ctx.Advertisement.ToList();
-        public Advertisement GetAdvertisement(int estateId) => ctx.Advertisement.Select(ad => ad)
-                                                                                .Where(ad => ad.EstateId == estateId)
-                                                                                .First();
-        public List<Client> GetClients() => ctx.Client.ToList();
-        public List<Electricity> GetElectricities() => ctx.Electricity.ToList();
-        public Electricity GetElectricity(int estateId) => ctx.Electricity.Select(electricity => electricity)
-                                                                   .Where(electricity => electricity.EstateId == estateId)
-                                                                   .First();
-        public PublicService GetPublicService(int estateId) => ctx.PublicService.Select(service => service)
-                                                                                .Where(service => service.EstateId == estateId)
-                                                                                .First();
-
-        public Estate GetEstate(int id)
+        public Address GetAddress(int estateId) 
         {
-            Estate result = ctx.Estate.Select(e => e)
-                                      .Where(estate => estate.Id == id)
-                                      .First();
+            Address result = null;
 
-            return result;
+            var address = ctx.Address.Select(addr => addr)
+                             .Where(addr => addr.EstateId == estateId);
+            if (address.Count() > 0)
+                result = address.First();
+
+            return result; 
         }
+
+        public List<Advertisement> GetAdvertisements() => ctx.Advertisement.ToList();
+        public Advertisement GetAdvertisement(int estateId)
+        {
+            Advertisement result = null;
+
+            var advert = ctx.Advertisement.Select(ad => ad)
+                             .Where(ad => ad.EstateId == estateId);
+            if (advert.Count() > 0)
+                result = advert.First();
+
+            return result;                
+        }
+        public List<ClientRequest> GetClients() => ctx.ClientRequest.ToList();
+        public List<Electricity> GetElectricities() => ctx.Electricity.ToList();
+        public Electricity GetElectricity(int estateId) 
+        {
+            Electricity result = null;
+
+            var electricity = ctx.Electricity.Select(e => e)
+                             .Where(e => e.EstateId == estateId);
+
+            if (electricity.Count() > 0)
+                result = electricity.First();
+
+            return result;                
+        }
+        public WaterSystem GetWaterSystem(int estateId)
+        {
+            WaterSystem result = null;
+
+            var water = ctx.WaterSystem.Select(w => w)
+                             .Where(w => w.EstateId == estateId);
+                             
+            if (water.Count() > 0)
+                result = water.First();
+
+            return result;                
+        }
+
+        public PublicService GetPublicService(int estateId) 
+        {
+            PublicService result = null;
+
+            var service = ctx.PublicService.Select(s => s)
+                             .Where(s => s.EstateId == estateId);
+                             
+            if (service.Count() > 0)
+                result = service.First();
+
+            return result;                
+        }
+
+        public Estate GetEstate(int estateId)
+        {
+            Estate result = null;
+
+            var estate = ctx.Estate.Select(e => e)
+                             .Where(e => e.Id == estateId);
+                             
+            if (estate.Count() > 0)
+                result = estate.First();
+
+            return result;                
+        }
+
         public List<Estate> GetEstates(int from, int limit)
         {
             List<Estate> result = ctx.Estate.Select(e => e)
@@ -50,14 +103,91 @@ namespace backend.DataAccess
             return result;    
         }
 
+        public List<Estate> GetEstatesSimpleCriteria(string estateType, int minPrice, int maxPrice, string city)
+        {
+            var result = new List<Estate>();
+
+            List<Estate> estates = ctx.Estate.Select(e => e).Where(e => (e.Category.ToUpper() == estateType.ToUpper()) ||
+                                                                       (e.Price >= minPrice && e.Price <= maxPrice))
+                                                           .ToList();
+
+            bool contains = ctx.Address.Any(c => c.City.ToUpper() == city.ToUpper());
+            if ((estates.Count > 0) && contains) {
+                foreach (Estate estate in estates) 
+                {
+                    Address address = ctx.Address.Select(a => a).Where(a => a.EstateId == estate.Id).First();
+                    if (address.City.ToUpper() == city.ToUpper())
+                        result.Add(estate);
+                }
+            }
+            else {
+                result = estates;
+            }
+
+            return result;
+        }
+
+        public List<Estate> GetEstatesComplexCriteria(string estateType, int minPrice, int maxPrice, string city,
+
+                                                      int minSquareFeet, int maxSquareFeet, System.DateTime minBuiltAt, System.DateTime maxBuiltAt,
+                                                      string grade, /* elhelyezkedés */ int roomCount, int kitchenCount, int bathroomCount,
+                                                      int floors, bool refurbished, bool garage, bool elevator, bool garden, bool terace,
+                                                      bool basement, 
+                                                      
+                                                      bool suncollector, bool networkedHeating, bool woodenHeating, /* */
+                                                      /* */ bool remoteHeating, bool gasHeating, bool electricityHeating, bool floorHeating,
+                                                      bool grocery, bool gasStation, bool publicTransport, bool drugStore, bool school, 
+                                                      bool mailDepot, bool bank) {
+
+            var result = new List<Estate>();
+
+            var estates = GetEstatesSimpleCriteria(estateType, minPrice, maxPrice, city).Select(s => s)
+                     .Where(e => (e.SquareFeet >= minSquareFeet && e.SquareFeet <= maxSquareFeet) ||
+                                 (e.BuiltAt >= minBuiltAt && e.BuiltAt <= maxBuiltAt) ||
+                                 (e.Grade.ToUpper() == grade.ToUpper()) ||
+                                 (e.Room == roomCount) ||
+                                 (e.Kitchen == kitchenCount) ||
+                                 (e.Bathroom == bathroomCount) ||
+                                 (e.FloorCount == floors) ||
+                                 ((e.RefurbishedAt == null ? false : true) == refurbished) ||
+                                 (e.Garage == (garage ? 1 : 0)) ||
+                                 (e.Elevator == (elevator ? 1 : 0)) ||
+                                 (e.Garden == (garden ? 1 : 0)) ||
+                                 (e.Terace == (terace ? 1 : 0)) || 
+                                 (e.Basement == (basement ? 1 : 0))
+                     ).ToList();
+
+            // TODO
+
+
+            return result;
+        }
+
         public List<EstateClient> GetEstateClients() => ctx.EstateClient.ToList();
-        public List<GenericImage> GetGenericImages() => ctx.GenericImage.ToList();
-        public int GetProfilePictureId(string employeeId) => ctx.GenericImage.Select(image => image)
+        public List<GenericImage> GetEstateImages(int estateId)
+        {
+            List<GenericImage> result = ctx.GenericImage.Select(i => i)
+                                                        .Where(i => i.EstateId == estateId)
+                                                        .ToList();
+
+            return result;
+        }
+        public string GetProfilePictureId(string employeeId) => ctx.GenericImage.Select(image => image)
                                                                           .Where(image => image.UserId == employeeId)
                                                                           .First()
                                                                           .Id;
-        public GenericImage GetEstateThumbnail(int estateId) => ctx.GenericImage.Where(img => img.EstateId == estateId)
-                                                                                .First();
+        public GenericImage GetEstateThumbnail(int estateId)
+        {
+            GenericImage result = null;
+
+            var image = ctx.GenericImage.Select(i => i)
+                             .Where(i => i.EstateId == estateId);
+                             
+            if (image.Count() > 0)
+                result = image.First();
+
+            return result;                
+        }
         public List<HeatingSystem> GetHeatingSystems() => ctx.HeatingSystem.ToList();
         public HeatingSystem GetHeatingSystem(int estateId) => ctx.HeatingSystem.Select(hsys => hsys)
                                                                          .Where(hsys => hsys.EstateId == estateId)
@@ -81,6 +211,36 @@ namespace backend.DataAccess
             int size = (int) fileInfo.Length;
             result = new byte[size];
             stream.ReadAsync(result, 0, size);
+
+            return result;
+        }
+
+        public List<string> GetRandomImages(int count)
+        {
+            var result = new List<string>();
+
+            var generator = new System.Random();
+            var images = ctx.GenericImage.Select(i => i)
+                                        .Where(i => i.EstateId != null)
+                                        .ToList();
+            int length = images.Count();
+
+            for (int i = 0; i < count; ++i) 
+            {
+                int j = generator.Next(0, length - 1);
+                GenericImage image = images.ElementAt(j);
+
+                string name = image.Id;
+                name += image.Extension;
+
+                if (result.Contains(name))
+                {
+                    ++count;
+                    continue;
+                }
+
+                result.Add(name);
+            }
 
             return result;
         }
@@ -110,6 +270,7 @@ namespace backend.DataAccess
             var toUpdate = ctx.Estate.Select(e => e)
                                      .Where(e => e.Id == estate.Id)
                                      .First();
+                                     
             toUpdate.SquareFeet = estate.SquareFeet;
             toUpdate.Category = estate.Category;
             toUpdate.BuiltAt = estate.BuiltAt;
@@ -138,8 +299,9 @@ namespace backend.DataAccess
         public void UpdateAddress(Address address)
         {
             var toUpdate = ctx.Address.Select(a => a)
-                                      .Where(a => a.Id == address.Id)
+                                      .Where(a => a.EstateId == address.EstateId)
                                       .First();
+
             toUpdate.Country = address.County;
             toUpdate.County = address.County;
             toUpdate.City = address.City;
@@ -155,8 +317,9 @@ namespace backend.DataAccess
         public void UpdateElectricity(Electricity electricity)
         {
             var toUpdate = ctx.Electricity.Select(e => e)
-                                          .Where(e => e.Id == electricity.Id)
+                                          .Where(e => e.EstateId == electricity.EstateId)
                                           .First();
+
             toUpdate.Networked = electricity.Networked;
             toUpdate.SunCollector = electricity.SunCollector;
             toUpdate.Thermal = electricity.Thermal;
@@ -165,8 +328,9 @@ namespace backend.DataAccess
         public void UpdateHeatingSystem(HeatingSystem heating)
         {
             var toUpdate = ctx.HeatingSystem.Select(h => h)
-                                            .Where(h => h.Id == heating.Id)
+                                            .Where(h => h.EstateId == heating.EstateId)
                                             .First();
+
             toUpdate.FloorHeating = heating.FloorHeating;
             toUpdate.ByWood = heating.ByWood;
             toUpdate.ByRemote = heating.ByRemote;
@@ -179,8 +343,9 @@ namespace backend.DataAccess
         public void UpdatePublicService(PublicService publicService)
         {
             var toUpdate = ctx.PublicService.Select(p => p)
-                                            .Where(p => p.Id == publicService.Id)
+                                            .Where(p => p.EstateId == publicService.EstateId)
                                             .First();
+
             toUpdate.Bank = publicService.Bank;
             toUpdate.DrugStore = publicService.DrugStore;
             toUpdate.GasStation = publicService.GasStation;
@@ -195,8 +360,9 @@ namespace backend.DataAccess
         public void UpdateWaterSystem(WaterSystem waterSystem)
         {
             var toUpdate = ctx.WaterSystem.Select(w => w)
-                                          .Where(w => w.Id == waterSystem.Id)
+                                          .Where(w => w.EstateId == waterSystem.EstateId)
                                           .First();
+
             toUpdate.AvailabilityType = waterSystem.AvailabilityType;
 
             ctx.SaveChanges();
@@ -205,13 +371,15 @@ namespace backend.DataAccess
         public void UpdateAdvertisement(Advertisement advertisement)
         {
             var toUpdate = ctx.Advertisement.Select(a => a)
-                                            .Where(a => a.Id == advertisement.Id)
+                                            .Where(a => a.EstateId == advertisement.EstateId)
                                             .First();
+
             toUpdate.DescriptionDetail = advertisement.DescriptionDetail;
             toUpdate.LastModification = advertisement.LastModification;
             toUpdate.OfferType = advertisement.OfferType;
             toUpdate.OrderOfAppearance = advertisement.OrderOfAppearance;
             toUpdate.Title = advertisement.Title;
+            toUpdate.AdvertiserId = advertisement.AdvertiserId;
 
             ctx.SaveChanges();
         }
@@ -280,15 +448,7 @@ namespace backend.DataAccess
                                     .Where(a => a.EstateId == estateId)
                                     .First();
 
-            var popularity = ctx.Popularity.Select(p => p)
-                                           .Where(p => p.AdvertisementId == advertisement.Id)
-                                           .First();
-
-            ctx.Popularity.Remove(popularity);
-            ctx.SaveChanges();
-
             ctx.Advertisement.Remove(advertisement);
-            ctx.SaveChanges();
 
             var waterSystem = ctx.WaterSystem.Select(w => w)
                                     .Where(w => w.EstateId == estateId)
@@ -310,28 +470,43 @@ namespace backend.DataAccess
                                     .Where(a => a.EstateId == estateId)
                                     .First();
 
-            ctx.WaterSystem.Remove(waterSystem);                                    
-            ctx.PublicService.Remove(publicService);
-            ctx.HeatingSystem.Remove(heatingSystem);
-            ctx.Electricity.Remove(electricity);
-            ctx.Address.Remove(address);
-            ctx.SaveChanges();
-
             var images = ctx.GenericImage.Select(gi => gi)
                                          .Where(gi => gi.EstateId == estateId)
                                          .ToList();
-
-            ctx.GenericImage.RemoveRange(images);
-            ctx.SaveChanges();
 
             var estate = ctx.Estate.Select(e => e)
                                     .Where(e => e.Id == estateId)
                                     .First();
 
-            ctx.Estate.Remove(estate);
+            ctx.WaterSystem.Remove(waterSystem);                                    
             ctx.SaveChanges();
+            ctx.PublicService.Remove(publicService);
+            ctx.SaveChanges();
+            ctx.HeatingSystem.Remove(heatingSystem);
+            ctx.SaveChanges();
+            ctx.Electricity.Remove(electricity);
+            ctx.SaveChanges();
+            ctx.Address.Remove(address);
+            ctx.SaveChanges();
+            ctx.GenericImage.RemoveRange(images);
+            ctx.SaveChanges();
+            ctx.Estate.Remove(estate);
+            int affected = ctx.SaveChanges();
 
-            success = true;
+            if (affected == 1)
+                success = true;
+
+            string cd = Directory.GetCurrentDirectory();
+            foreach(GenericImage image in images)
+            {
+                string name = image.Id;
+                string extension = image.Extension;
+                string path = Path.Combine(cd, "Client", "static", name);
+                path += extension;
+
+                File.Delete(path);
+            }
+
             return success;
         }
 
@@ -340,6 +515,24 @@ namespace backend.DataAccess
             var inv = new Invitation();
             ctx.Invitation.Add(inv);
             ctx.SaveChanges();
+        }
+
+        public bool AddImage(GenericImage image)
+        {
+            bool success = false;
+
+            ctx.GenericImage.Add(image);
+            int affected = ctx.SaveChanges();
+
+            if (affected == 1)
+                success = true;
+
+            return success;
+        }
+
+        public void AddClientRequest(ClientRequest clientRequest)
+        {
+            ctx.ClientRequest.Add(clientRequest);
         }
 
         public bool DeleteEmployee(string employeeId)

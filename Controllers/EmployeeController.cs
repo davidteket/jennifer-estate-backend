@@ -97,6 +97,27 @@ namespace backend.Controllers
             return response;
         }
 
+        [HttpGet]
+        // Munkatárs azonosító.
+        //
+        public string GetCurrentUserId()
+        {
+            var response = new ItemPostedResultModel();
+
+            var getUserTask = Startup.UserManager.GetUserAsync(User);
+            getUserTask.Wait();
+
+            if (getUserTask.IsCompletedSuccessfully && getUserTask.Result != null) {
+                response.ItemId = getUserTask.Result.Id;
+                response.Message = "Felhasználói azonosító sikeresen lekérve.";
+                response.Success = true;
+            }
+            else 
+                response.Message = "Hiba történt a felhasználói azonosító lekérése közben.";
+
+            return JsonConvert.SerializeObject(response);
+        }
+
         #endregion
 
         #region WebAPI POST
@@ -107,6 +128,11 @@ namespace backend.Controllers
         public string NewRole(string roleTitle)
         {
             var response = new ItemPostedResultModel();
+
+            //if (!Startup.SignInManager.IsSignedIn(User)) {
+            //    response.Message = "Bejelentkezés szükséges.";
+            //    goto cancelNewRole;
+            //}
 
             var role = new UserRole();
 
@@ -139,6 +165,11 @@ namespace backend.Controllers
         public string Registration()
         {
             var response = new ItemPostedResultModel();
+
+            //if (!Startup.SignInManager.IsSignedIn(User)) {
+            //    response.Message = "Bejelentkezés szükséges.";
+            //    goto cancelRegistration;
+            //}
             
             var user = new DataAccess.Entities.Identity.User();
 
@@ -199,7 +230,7 @@ namespace backend.Controllers
                 }
             }
 
-            //cancelRegistration:
+            cancelRegistration:
             return JsonConvert.SerializeObject(response);
         }
 
@@ -236,7 +267,7 @@ namespace backend.Controllers
 
                 if (checkPasswordTask.IsCompletedSuccessfully && checkPasswordTask.Result == true)
                 {
-                    var signInTask = Startup.SignInManager.PasswordSignInAsync(user, credentials.Password, true, false);
+                    var signInTask = Startup.SignInManager.PasswordSignInAsync(user, credentials.Password, false, false);
                     signInTask.Wait();
 
                     if (signInTask.IsCompletedSuccessfully) {
@@ -261,6 +292,11 @@ namespace backend.Controllers
         {
             var response = new ItemPostedResultModel();
 
+            if (!Startup.SignInManager.IsSignedIn(User)) {
+                response.Message = "Bejelentkezés szükséges.";
+                goto cancelLogout;
+            }
+
             var signOutTask = Startup.SignInManager.SignOutAsync();
             signOutTask.Wait();
 
@@ -269,6 +305,7 @@ namespace backend.Controllers
             else
                 response.Message = "Hiba történt kijelentkezéskor.";
 
+            cancelLogout: 
             return JsonConvert.SerializeObject(response);
         }
 
@@ -278,6 +315,11 @@ namespace backend.Controllers
         public string UpdateProfile()
         {
             var response = new ItemPostedResultModel();
+
+            if (!Startup.SignInManager.IsSignedIn(User)) {
+                response.Message = "Bejelentkezés szükséges.";
+                goto cancelUpdateBio;
+            }
 
             if (!Startup.SignInManager.IsSignedIn(new System.Security.Claims.ClaimsPrincipal(HttpContext.User.Identity)))
             {
@@ -337,6 +379,11 @@ namespace backend.Controllers
         {
             string response = null;
 
+            if (!Startup.SignInManager.IsSignedIn(User)) {
+                response = "Bejelentkezés szükséges.";
+                goto cancelInvitation;
+            }
+
             var client = new SmtpClient(Startup.Email.Host, Startup.Email.Port);
             client.EnableSsl = true;
         
@@ -361,6 +408,7 @@ namespace backend.Controllers
             else
                 response = "Nem sikerült elküldeni a meghívót.";
 
+            cancelInvitation:
             return response;
         }
 
@@ -390,6 +438,11 @@ namespace backend.Controllers
         public string Delete(string employeeId)
         {
             var response = new ItemPostedResultModel();
+
+            if (!Startup.SignInManager.IsSignedIn(User)) {
+                response.Message = "Bejelentkezés szükséges.";
+                goto cancelDelete;
+            }
 
             if (employeeId == null) {
                 response.Message = "Nincs megadva azonosító.";

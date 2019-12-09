@@ -19,7 +19,8 @@ namespace backend
     {
         public IConfiguration Configuration { get; }
 
-        private static readonly string developerConnectionString = "Server=tcp:jennifer-estate.database.windows.net,1433;Initial Catalog=jennifer-prod-db;Persist Security Info=False;User ID=caribou;Password=R2398qg#AGc%;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
+        //private static readonly string developerConnectionString = "Server=tcp:jennifer-estate.database.windows.net,1433;Initial Catalog=jennifer-prod-db;Persist Security Info=False;User ID=caribou;Password=R2398qg#AGc%;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
+        private static readonly string developerConnectionString = "Server=localhost;Database=JenniferEstate;User Id=SA;Password=valami888__;";
         private static readonly string clientSideHostDirectoryName = "frontend";
         public static DbContextOptionsBuilder ctxOptionsBuilder => new DbContextOptionsBuilder()
                                                                 .UseSqlServer(developerConnectionString, null);
@@ -111,7 +112,11 @@ namespace backend
                                        clientSideHostDirectoryName);
 
             app.UseDefaultFiles(frontEnd);
-            app.UseStaticFiles();
+            app.UseStaticFiles(new StaticFileOptions() {
+                FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(
+                    System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "Client")),
+                    RequestPath = "/app"
+            });
 
             app.UseCookiePolicy();
 

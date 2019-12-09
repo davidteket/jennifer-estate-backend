@@ -11,21 +11,25 @@ namespace backend.DataAccess
         Address GetAddress(int estateId);
         List<Advertisement> GetAdvertisements();
         Advertisement GetAdvertisement(int estateId);
-        List<Client> GetClients();
+        List<ClientRequest> GetClients();
         List<Electricity> GetElectricities();
         Electricity GetElectricity(int estateId);
+        WaterSystem GetWaterSystem(int estateId);
         PublicService GetPublicService(int estateId);
         Estate GetEstate(int id);
+
+        List<Estate> GetEstatesSimpleCriteria(string estateType, int minPrice, int maxPrice, string city);
         List<Estate> GetEstates(int from, int limit);
         List<EstateClient> GetEstateClients();
-        List<GenericImage> GetGenericImages();
-        int GetProfilePictureId(string employeeId);
+        List<GenericImage> GetEstateImages(int estateId);
+        string GetProfilePictureId(string employeeId);
         GenericImage GetEstateThumbnail(int estateId);
         List<HeatingSystem> GetHeatingSystems();
         HeatingSystem GetHeatingSystem(int estateId);
         List<WaterSystem> GetWaterSystems();
         CompanyDetails GetCompanyDetails();
         byte[] GetImage(int imageId);
+        List<string> GetRandomImages(int count);
 
         bool CheckInvitationStatus(Invitation invitation);
 
@@ -52,6 +56,9 @@ namespace backend.DataAccess
         void AddWaterSystem(WaterSystem waterSystem, int estateId);
         void AddAdvertisement(Advertisement advertisement, int estateId, string advertiserId);
         void AddInvitation(string inviteeId);
+        bool AddImage(GenericImage image);
+
+        void AddClientRequest(ClientRequest clientRequest);
 
         #endregion
         #region DELETE

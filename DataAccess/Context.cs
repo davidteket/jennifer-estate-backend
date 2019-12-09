@@ -10,7 +10,7 @@ namespace backend.DataAccess
     {
         public DbSet<Address> Address { get; set; }
         public DbSet<Advertisement> Advertisement { get; set; }
-        public DbSet<Client> Client { get; set; }
+        public DbSet<ClientRequest> ClientRequest { get; set; }
         public DbSet<Electricity> Electricity { get; set; }
         public DbSet<Estate> Estate { get; set; }
         public DbSet<EstateClient> EstateClient { get; set; }

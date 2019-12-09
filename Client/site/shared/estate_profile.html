@@ -1,0 +1,849 @@
+<div class="site-overlayitem mt-4 p-4 container">
+
+    <!-- Hirdetés aktivitására vonatkozó infók. -->
+    <div id='alert-for-logged-in-users' class="row" style="display: none;">
+            <div class="col">
+
+                    <div class="alert alert-danger" role="alert">
+
+                            <span class="font-weight-bold">
+                                Figyelem! Ez a hirdetés jelenleg inaktív.
+                            </span>
+
+                            <br/>
+
+                            A hirdetés aktiváláshoz legalább 4 darab kép feltöltése szükséges.
+                            
+                            <br/>
+                            <br/>
+
+                            <span class="font-weight-bold">
+                                Aktív hirdetést csak belépett státuszú felhasználó tud inaktiválni.
+                            </span>
+
+                    </div>
+
+            </div>
+        
+    </div>
+
+    <!-- Hirdetés szerkesztése. -->
+    <div class="row">    
+
+        <span class="col">
+
+                <!-- Hirdetés szerkesztése ablak. -->
+                <div class="modal fade" id="estate-edit-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+
+                        <div class="modal-dialog modal-lg" role="document">
+                                <div class="modal-content">
+
+                                        <div class="modal-header">
+
+                                                <h4 class="modal-title" id="exampleModalLabel">
+                                                        Hirdetés Szerkesztése
+                                                </h4>
+
+                                                <button id='close-edit-dialog-btn' type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                </button>
+
+                                        </div> <!-- fejléc -->
+
+                                        <div class="modal-body">
+
+                                            <div class="container">
+
+                                                    <div class="row">
+
+                                                        <div class="form-group col">
+                                                            <label for="edit-estate-price">Ár:</label>
+                                                            <input type="text" id="edit-estate-price" class="form-control" placeholder="pld. 1234567"/>
+                                                        </div>
+
+                                                        <div class="form-group col">
+                                                            <label for="edit-estate-squarefeet">Négyzetméter:</label>
+                                                            <input type="text" id="edit-estate-squarefeet" class="form-control" placeholder="pld. 1200"/>
+                                                        </div>
+
+                                                        <div class="form-group col">
+                                                                <label for="edit-estate-category">Kategória:</label>
+                                                                <select id="edit-estate-category" class="form-control">
+                                                                        <option>Kertesház</option>
+                                                                        <option>Lakás</option>
+                                                                        <option>Telek</option>
+                                                                        <option>Iroda</option>
+                                                                </select>
+                                                        </div>
+
+                                                    </div>
+
+                                                    <div class="row mt-3">
+    
+                                                        <div class="form-group col">
+                                                            <label for="edit-estate-builtat">Építve:</label>
+                                                            <input type="text" id="edit-estate-builtat" class="form-control" placeholder="év"/>
+                                                        </div>
+
+                                                        <div class="form-group col">
+                                                            <label for="edit-estate-refurbishedat">Felújítva:</label>
+                                                            <input type="text" id="edit-estate-refurbishedat" class="form-control" placeholder="év"/>
+                                                        </div>
+
+                                                        <div class="form-group col">
+                                                                <label for="edit-estate-quality">Minőség:</label>
+                                                                <select id="edit-estate-quality" class="form-control">
+                                                                        <option>Új</option>
+                                                                        <option>Felújított</option>
+                                                                        <option>Felújítandó</option>
+                                                                        <option>Használt</option>
+                                                                </select>
+                                                        </div>
+    
+                                                    </div>
+
+                                                    <div class="row mt-3">
+    
+                                                            <div class="form-group col">
+                                                                <label for="edit-estate-roomcount">Szobák:</label>
+                                                                <input type="text" id="edit-estate-roomcount" class="form-control" placeholder="darab"/>
+                                                            </div>
+    
+                                                            <div class="form-group col">
+                                                                <label for="edit-estate-kitchencount">Konyhák:</label>
+                                                                <input type="text" id="edit-estate-kitchencount" class="form-control" placeholder="darab"/>
+                                                            </div>
+    
+                                                            <div class="form-group col">
+                                                                    <label for="edit-estate-bathroomcount">Fürdőszobák:</label>
+                                                                    <input type="text" id="edit-estate-bathroomcount" class="form-control" placeholder="darab"/>
+                                                            </div>
+        
+                                                    </div>
+
+                                                    <div class="row mt-3">
+    
+                                                            <div class="form-group col">
+                                                                <label for="edit-estate-floorcount">Szintek:</label>
+                                                                <input type="text" id="edit-estate-floorcount" class="form-control" placeholder="darab"/>
+                                                            </div>
+
+                                                            <div class="form-group col">
+                                                                <label for="edit-estate-propertysquarefeet">Telek:</label>
+                                                                <input type="text" id="edit-estate-propertysquarefeet" class="form-control" placeholder="négyzetméter"/>
+                                                            </div>
+
+                                                            <div class="form-group col">
+                                                                <label for="edit-estate-garagesquarefeet">Garázs:</label>
+                                                                <input type="text" id="edit-estate-garagesquarefeet" class="form-control" placeholder="négyzetméter"/>
+                                                            </div>
+        
+                                                    </div>
+
+                                                    <div class="row mt-3">
+    
+                                                            <div class="form-group col">
+                                                                <label for="edit-estate-gardensquarefeet">Kert:</label>
+                                                                <input type="text" id="edit-estate-gardensquarefeet" class="form-control" placeholder="négyzetméter"/>
+                                                            </div>
+
+                                                            <div class="form-group col">
+                                                                <label for="edit-estate-terracesquarefeet">Terasz:</label>
+                                                                <input type="text" id="edit-estate-terracesquarefeet" class="form-control" placeholder="négyzetméter"/>
+                                                            </div>
+        
+                                                    </div>
+
+                                                    <div class="row mt-3">
+                                                            <div class="col tags">
+                                                            
+                                                                    <span class="tag p-2 m-1 hvr-grow" id="edit-estate-hasgarage" value="0">Garázs</span>
+                                                                    <span class="tag p-2 m-1 hvr-grow" id="edit-estate-haselevator" value="0">Lift</span>
+                                                                    <span class="tag p-2 m-1 hvr-grow" id="edit-estate-hasgarden" value="0">Kert</span>
+                                                                    <span class="tag p-2 m-1 hvr-grow" id="edit-estate-hasterrace" value="0">Terasz</span>
+                                                                    <span class="tag p-2 m-1 hvr-grow" id="edit-estate-hasbasement" value="0">Pince</span>
+                                                                    <span class="tag p-2 m-1 hvr-grow" id="edit-estate-hascomfort" value="0">Összkomfortos</span>
+                                                                    <span class="tag p-2 m-1 hvr-grow" id="edit-estate-hassuncollector" value="0">Napkollektor</span>
+                                                                    <span class="tag p-2 m-1 hvr-grow" id="edit-estate-hasnetworkedheating" value="0">Hálózati Fűtés</span>
+                                                                    <span class="tag p-2 m-1 hvr-grow" id="edit-estate-haswoodenheating" value="0">Fatüzelésű</span>
+                                                                    <span class="tag p-2 m-1 hvr-grow" id="edit-estate-hasremoteheating" value="0">Távfűtéses</span>
+                                                                    <span class="tag p-2 m-1 hvr-grow" id="edit-estate-hasgasheating" value="0">Gázfűtéses</span>
+                                                                    <span class="tag p-2 m-1 hvr-grow" id="edit-estate-haselectricityheating" value="0">Villamos Fűtésű</span>
+                                                                    <span class="tag p-2 m-1 hvr-grow" id="edit-estate-hasfloorheating" value="0">Padlófűtéses</span>
+                                                                    <span class="tag p-2 m-1 hvr-grow" id="edit-estate-hasgrocerynearby" value="0">Áruház</span>
+                                                                    <span class="tag p-2 m-1 hvr-grow" id="edit-estate-haspetrolstationnearby" value="0">Benzinkút</span>
+                                                                    <span class="tag p-2 m-1 hvr-grow" id="edit-estate-haspublictransportnearby" value="0">Tömegközlekedés</span>
+                                                                    <span class="tag p-2 m-1 hvr-grow" id="edit-estate-hashaspharmacynearby" value="0">Gyógyszertár</span>
+                                                                    <span class="tag p-2 m-1 hvr-grow" id="edit-estate-hasschoolnearby" value="0">Iskola</span>
+                                                                    <span class="tag p-2 m-1 hvr-grow" id="edit-estate-hasmaildepotnearby" value="0">Posta</span>
+                                                                    <span class="tag p-2 m-1 hvr-grow" id="edit-estate-hasbanknearby" value="0">Bank</span>
+                                            
+                                                            </div>  
+                                                    </div>
+
+                                                    <div class="row mt-3">
+    
+                                                            <div class="form-group col">
+                                                                <label for="edit-estate-country">Ország:</label>
+                                                                <input type="text" id="edit-estate-country" class="form-control" placeholder="pld. Magyarország"/>
+                                                            </div>
+
+                                                            <div class="form-group col">
+                                                                <label for="edit-estate-county">Megye:</label>
+                                                                <input type="text" id="edit-estate-county" class="form-control" placeholder="pld. Pest"/>
+                                                            </div>
+
+                                                            <div class="form-group col">
+                                                                <label for="edit-estate-city">Város:</label>
+                                                                <input type="text" id="edit-estate-city" class="form-control" placeholder="pld. Budapest"/>
+                                                            </div>
+    
+                                                    </div>
+
+                                                    <div class="row mt-3">
+    
+                                                            <div class="form-group col">
+                                                                <label for="edit-estate-postcode">Irányítószám:</label>
+                                                                <input type="text" id="edit-estate-postcode" class="form-control" placeholder="pld. 1105"/>
+                                                            </div>
+
+                                                            <div class="form-group col">
+                                                                <label for="edit-estate-street">Utca:</label>
+                                                                <input type="text" id="edit-estate-street" class="form-control" placeholder="pld. Andrássy Út"/>
+                                                            </div>
+
+                                                            <div class="form-group col">
+                                                                <label for="edit-estate-housenumber">Házszám:</label>
+                                                                <input type="text" id="edit-estate-housenumber" class="form-control" placeholder="pld. 28"/>
+                                                            </div>
+    
+                                                    </div>
+
+                                                    <div class="row mt-3">
+    
+                                                            <div class="form-group col">
+                                                                <label for="edit-estate-floor">Emelet:</label>
+                                                                <input type="text" id="edit-estate-floor" class="form-control" placeholder="pld. 2"/>
+                                                            </div>
+
+                                                            <div class="form-group col">
+                                                                <label for="edit-estate-door">Ajtó:</label>
+                                                                <input type="text" id="edit-estate-door" class="form-control" placeholder="pld. 8"/>
+                                                            </div>
+    
+                                                    </div>
+
+                                                    <div class="row mt-3">
+    
+                                                            <div class="form-group col">
+                                                                <label for="edit-estate-adtitle">Hirdetés Címe:</label>
+                                                                <input type="text" id="edit-estate-adtitle" class="form-control" placeholder="leírás..."/>
+                                                            </div>
+
+                                                            <div class="form-group col">
+                                                                <label for="edit-estate-adtype">Hirdetés Típusa:</label>
+                                                                <select id="edit-estate-adtype" class="form-control">
+                                                                        <option>Eladó</option>
+                                                                        <option>Kiadó</option>
+                                                                </select>
+                                                            </div>
+    
+                                                    </div>
+
+                                                    <div class="row mt-3">
+
+                                                            <div class="form-group col">
+                                                                <label for="edit-estate-addescr">Hirdetés Szövege:</label>
+                                                                <textarea id="edit-estate-addescr" class="form-control" placeholder="leírás..."></textarea>
+                                                            </div>
+    
+                                                    </div>
+                                                        
+                                            </div>
+
+                                        </div> <!-- tartalom -->
+
+                                        <div class="modal-footer">
+
+                                                <div class="container">
+                                                        <div class="row">
+                                                                
+                                                                <div class="alert alert-warning" role="alert">
+                                                                    Figyelem! A hirdetés frissítésével a régi adatok elvesznek.
+                                                                    <br/>
+                                                                    Amennyiben megfelelőnek találod a megadott adatokat, úgy kérlek kattints a Frissítés gombra!
+                                                                    <br/>
+                                                                    <br/>
+                                                                    <span class="font-weight-bold">
+                                                                        Hirdetéseket szerkeszteni csak belépett státuszú felhasználó felhasználó tud a hirdetés adatlapján.
+                                                                    </span>
+                                                                </div>
+
+                                                                <span class="col">
+
+                                                                        <button id="cancel-edit-estate-btn" class="btn btn-danger float-left mr-3 hvr-grow" type="button">
+                
+                                                                                <span class="fas fa-backspace"></span>
+                                                                                &nbsp;
+                                                                                Mégsem&nbsp;&nbsp;
+                                                                                
+                                                                        </button>
+
+                                                                        <button id="edit-estate-confirm-btn"
+                                                                                type="button" 
+                                                                                class="btn btn-success hvr-grow float-right">
+                                                                                <span class="fas fa-save"></span>
+                                                                                &nbsp;
+                                                                                Frissítés
+                                                                        </button>
+                                                                </span>
+
+                                                        </div>
+                                                </div>
+
+                                        </div>
+        
+                                </div>
+                        </div>
+
+                </div>
+    
+           </span>
+        </div>
+
+        <div class="row">
+
+        <div class="col text-center mb-3">
+
+                <button id="edit-estate-btn"
+                        type="button" 
+                        class="btn btn-warning hvr-grow"
+                        data-toggle="modal"
+                        data-target="#estate-edit-modal">
+
+                            <span class="fas fa-edit"></span>
+                            &nbsp;
+                            Hirdetés Szerkesztése
+
+                </button>
+
+        </div>
+
+        <!-- Képfeltöltés. -->
+        <div class="col text-center mb-3">
+
+                <button id="upload-estate-images-btn"
+                        type="button" 
+                        class="btn btn-success hvr-grow"
+                        data-toggle="modal"
+                        data-target="#image-upload-modal">
+
+                            <span class="fas fa-arrow-circle-up"></span>
+                            &nbsp;
+                            Képfeltöltés
+
+                </button>
+
+        </div>
+
+        <!-- Hirdetés törlése. -->
+        <div class="col text-center mb-3">
+
+                <button id="delete-estate-btn"
+                        type="button" 
+                        class="btn btn-danger hvr-grow"
+                        data-toggle="modal"
+                        data-target="#estate-delete-modal">
+
+                            <span class="fas fa-trash-alt"></span>
+                            &nbsp;
+                            Hirdetés Törlése
+
+                </button>
+
+        </div>
+
+    </div>
+
+    <!-- Hirdetés törlése ablak. -->
+    <div class="modal fade" id="estate-delete-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+
+            <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+
+                            <div class="modal-header">
+
+                                    <h5 class="modal-title" id="exampleModalLabel">
+                                            Hirdetés Törlése - Megerősítés
+                                    </h5>
+
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" id='close-estate-delete-btn'>
+                                            <span aria-hidden="true">&times;</span>
+                                    </button>
+
+                            </div>
+
+                            <div class="modal-body">
+
+                                    <p class="alert alert-danger">
+                                            Biztosan törölni szeretnéd ezt a hirdetést?
+                                            <br/>
+                                            <br/>
+                                            <span class="font-weight-bold">
+                                                    Jóváhagyás esetén a műveletet nem lehet visszavonni,
+                                                    az adatok végleges törlésre kerülnek.
+                                            </span>
+                                            <br/>
+                                    </p>
+
+                            </div>
+
+                            <div class="modal-footer">
+
+                                    <div class="container">
+                                            <div class="row">
+
+                                                    <span class="col">
+                                                            <button id="cancel-estate-delete-btn"
+                                                                    type="button" 
+                                                                    class="btn btn-primary hvr-grow">
+                                                                    <span class="fa fa-backspace"></span>
+                                                                    &nbsp;
+                                                                    Mégsem
+                                                            </button>
+                                                    </span>
+
+                                                    <span class="col">
+                                                            <button id="confirm-estate-delete-btn"
+                                                                    type="button" 
+                                                                    class="btn btn-danger hvr-grow">
+                                                                    <span class="fa fa-trash-alt"></span>
+                                                                    &nbsp;
+                                                                    Jóváhagyás
+                                                            </button>
+                                                    </span>
+
+                                            </div>
+                                    </div>
+
+                            </div>
+
+                    </div>
+            </div>
+
+    </div>
+
+    
+
+    <!-- Képfeltöltés ablak. -->
+    <div class="row">
+
+        <div class="col">
+
+                <div class="modal fade" id="image-upload-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+
+                        <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+
+                                        <div class="modal-header">
+
+                                                <h5 class="modal-title" id="exampleModalLabel">
+                                                        Képfeltöltés Felület
+                                                </h5>
+
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                </button>
+
+                                        </div>
+
+                                        <div class="modal-body">
+                                                        
+                                                <div class="alert alert-dark site-link-pointer"
+                                                     id="image-upload-dropzone">
+
+                                                        <br/>
+                                                        <br/>
+                                                                Húzd a képeket erre a felületre, vagy klikkelj rá a tallózáshoz.
+                                                        <br/>
+                                                        <br/>
+
+                                                </div>
+
+                                                
+                                                <form method='POST' id='image-form'>
+
+                                                        <input id="image-input-elem"
+                                                                name='file'
+                                                                type="file"
+                                                                class="inputfile"                                                                       
+                                                                draggable="true"
+                                                                style="visibility: hidden;"/>
+                                                                
+                                                </form>
+
+                                        </div>
+
+                                        <div class="modal-footer">
+
+                                                <div class="container">
+                                                        <div id="uploaded-images-container">
+                                                                
+                                                                <div class="col">  
+
+                                                                        <h5 id="uploaded-image-bar"
+                                                                            class="text-center badge-success text-light font-weight-bold rounded p-2 d-none">
+                                                                                <span class="fa fa-check"></span>
+                                                                                &nbsp;
+                                                                                        <!-- Feltöltött képek. -->
+                                                                        </h5>
+
+                                                                </div>
+                                                        
+                                                        </div>
+                                                        <div id="awaiting-for-upload-images-container" class="row">
+                                                                
+                                                        </div>
+                                                </div>
+
+                                        </div>
+        
+                                </div>
+                        </div>
+
+                </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="row">
+
+        <div class="col">
+
+                    <h4 id="ad-title"
+                        class="text-center font-weight-bold text-uppercase p-2">
+                        <!-- Hirdetés címe. -->
+                    </h4>
+        
+                    <h6 id="ad-location"
+                        class="text-center font-italic p-2">
+                        <span class="fa fa-location-arrow"></span>
+                        &nbsp;
+                        <!-- Lokáció. -->
+                    </h6>
+        
+                    <h5 id="ad-price"
+                        class="text-center badge-warning text-dark font-weight-bold rounded p-2">
+                        <!-- Ár. -->
+                    </h5>
+        
+                </div>
+    </div>
+
+    <!-- Képgaléria. -->
+    <div id='image-gallery' data-toggle="modal" data-target='image-gallery-modal'>
+        
+        <div class="row">
+                
+                <!-- Elsődleges kép. -->
+                <div class="col">
+                        <img id='estate-profile-img-primary' src="/app/static/no-image.jpg" class="img-fluid site-link-pointer pb-1 rounded float-left" width="100%" style="max-height: 600px;"/>
+                </div>
+
+        </div>
+
+        <div class="row">
+
+                <div id='additional-estate-pictures' class="col text-center m-1">
+                        <!-- További képek. -->
+                </div>
+
+        </div>
+
+        <div class="row">
+
+                <div class="col">&nbsp;</div>
+                <div class="tag p-2 hvr-grow site-link-pointer col text-center mt-2" id='additional-picture-count'>
+                        <!-- További n kép a galériában. -->
+                </div>
+                <div class="col">&nbsp;</div>
+                
+        </div>
+
+    </div>
+
+    <!-- Képnézegető. -->
+    <div class="modal fade bd-example-modal-xl"
+         id="image-gallery-modal"
+         tabindex="-1"
+         role="dialog"
+         aria-labelledby="myExtraLargeModalLabel"
+         aria-hidden="true">
+
+                <div class="modal-dialog modal-xl">
+
+                        <div class='modal-content' style="background-color: #343a40 !important;">
+
+                                <!-- Dinamikus. -->
+                                <img id='img-gallery-content' src="#" class="col"/>
+
+                                <div >
+                                        <!-- Előző kép. -->
+                                        <button type="button" id='prev-gallery-item' class="btn btn-secondary m-2 float-left">
+                                                <span class='fa fa-arrow-left'></span>
+                                                &nbsp;
+                                                Előző
+                                        </button>
+
+                                        <!-- Következő kép. -->
+                                        <button type="button" id='next-gallery-item' class="btn btn-primary m-2">
+                                                Következő
+                                                &nbsp;
+                                                <span class='fa fa-arrow-right'></span>
+                                        </button>
+                                </div>
+                        </div>
+
+                </div>
+
+    </div>
+
+    <!-- Leírás. -->
+    <div class="row">
+
+
+        <div class="col">
+
+            <hr class="site-ruler-dotted"/>
+
+            <h4 class="text-center pt-4">
+                Leírás
+            </h4>
+
+        </div>
+
+    </div>
+
+    <div class="row">
+
+            <div class="col">
+    
+                <p id="ad-description">
+                    <!-- Leírás. -->
+                </p>
+                
+                <hr class="site-ruler-dotted"/>
+
+            </div>
+    
+    </div>
+
+    <!-- Ingatlan adatlap. -->
+    <div class="row">
+
+        <div class="col">&nbsp;</div>
+        <div class="tag p-3 hvr-grow site-link-pointer col text-center mt-2 mb-2" id='show-estate-detailsheet-btn'>
+                Adatlap Megtekintése
+        </div>
+        <div class="col">&nbsp;</div>
+                
+    </div>
+
+     <div class="row" id="estate-detailsheet">
+
+        <div class="col float-right">
+
+                <table class="table table-striped table-dark">
+                        
+                        <tbody>
+                                <!-- Kategória. -->
+                                <tr>
+                                        <td>
+                                                <span class="fa fa-home" style="color: crimson;"></span>
+                                        </td>
+
+                                        <td>
+                                                Kategória
+                                        </td>
+                                        
+                                        <td class="site-estate-data-point-description">
+                                                Kertesház
+                                        </td>
+                                </tr>
+
+                                <tr>
+                                        <td>
+                                                <span class="fa fa-square" style="color: crimson;"></span>
+                                        </td>
+
+                                        <td>
+                                                Alapterület
+                                        </td>
+                                        
+                                        <td class="site-estate-data-point-description">
+                                                1234&nbsp;m<sup>2</sup>
+                                        </td>
+                                </tr>
+
+                                <tr>
+                                        <td>
+                                                <span class="fa fa-calendar-alt" style="color: crimson;"></span>
+                                        </td>
+
+                                        <td>
+                                                Építés Éve
+                                        </td>
+                                        
+                                        <td class="site-estate-data-point-description">
+                                                2008
+                                        </td>
+                                </tr>
+
+                                <tr>
+                                        <td>
+                                                <span class="fa fa-calendar-plus" style="color: crimson;"></span>
+                                        </td>
+
+                                        <td>
+                                                Felújítás Éve
+                                        </td>
+                                        
+                                        <td class="site-estate-data-point-description">
+                                                2018
+                                        </td>
+                                </tr>
+
+                                <tr>
+                                        <td>
+                                                <span class="fa fa-star" style="color: crimson;"></span>
+                                        </td>
+
+                                        <td>
+                                                Minőség
+                                        </td>
+                                        
+                                        <td class="site-estate-data-point-description">
+                                                Új
+                                        </td>
+                                </tr>
+
+                                <tr>
+                                        <td>
+                                                <span class="fa fa-bed" style="color: crimson;"></span>
+                                        </td>
+
+                                        <td>
+                                                Szobák Száma
+                                        </td>
+                                        
+                                        <td class="site-estate-data-point-description">
+                                                3
+                                        </td>
+                                </tr>
+
+                                <tr>
+                                        <td>
+                                                <span class="fa fa-utensils" style="color: crimson;"></span>
+                                        </td>
+
+                                        <td>
+                                                Konyhák Száma
+                                        </td>
+                                        
+                                        <td class="site-estate-data-point-description">
+                                                2
+                                        </td>
+                                </tr>
+
+                                <tr>
+                                        <td>
+                                                <span class="fa fa-bath" style="color: crimson;"></span>
+                                        </td>
+
+                                        <td>
+                                                Fürdőszobák Száma
+                                        </td>
+                                        
+                                        <td class="site-estate-data-point-description">
+                                                1
+                                        </td>
+                                </tr>
+
+                                <tr>
+                                        <td>
+                                                <span class="fa fa-arrow-up" style="color: crimson;"></span>
+                                        </td>
+
+                                        <td>
+                                                Szintek Száma
+                                        </td>
+                                        
+                                        <td class="site-estate-data-point-description">
+                                                2
+                                        </td>
+                                </tr>
+
+                                <tr>
+                                        <td>
+                                                <span class="fa fa-car" style="color: crimson;"></span>
+                                        </td>
+
+                                        <td>
+                                                Garázs
+                                        </td>
+                                        
+                                        <td class="site-estate-data-point-description">
+                                                Van 1234&nbsp;m<sup>2</sup>
+                                        </td>
+                                </tr>
+
+                                <tr>
+                                        <td>
+                                                <span class="fa fa-umbrella-beach" style="color: crimson;"></span>
+                                        </td>
+
+                                        <td>
+                                                Terasz
+                                        </td>
+                                        
+                                        <td class="site-estate-data-point-description">
+                                                Van 1234&nbsp;m<sup>2</sup>
+                                        </td>
+                                </tr>
+
+                                <tr>
+                                        <td>
+                                                <span class="fa fa-tree" style="color: crimson;"></span>
+                                        </td>
+
+                                        <td>
+                                                Kert
+                                        </td>
+                                        
+                                        <td class="site-estate-data-point-description">
+                                                Van 1234&nbsp;m<sup>2</sup>
+                                        </td>
+                                </tr>
+                        </tbody>
+                </table>
+
+        </div>
+
+    </div>
+
+        <!-- Google térkép. -->
+        <div class="embed-responsive embed-responsive-21by9">
+                
+                <iframe width="600"
+                        height="300"
+                        frameborder="0"
+                        style="border:0"
+                        src="https://www.google.com/maps/embed/v1/place?q=Arl%C3%B3%2C%20Ady%20Endre%20%C3%BAt%20390%2C%20Magyarorsz%C3%A1g&key=AIzaSyBpgNrEKnH7O5rYtZAW9HpYFnqMqhJXfz4"
+                        allowfullscreen>
+                </iframe>
+
+        </div>
+                
+</div>

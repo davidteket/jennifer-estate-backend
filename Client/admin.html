@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        
+        <title>
+            Admin Felület - Dunakanyar House Ingatlan
+        </title>
+
+        <!-- fonts -->
+        <link href="https://fonts.googleapis.com/css?family=Comfortaa&display=swap" rel="stylesheet">
+
+        <!-- site/css -->
+        <link rel="stylesheet" href="site/css/style.css"/>
+
+        <!-- lib/css -->
+        <link rel="stylesheet" href="lib/bootstrap.css"/>
+        <link rel="stylesheet" href="lib/hover.css"/>
+        <link rel="stylesheet" href="lib/fontawesome/css/all.css"/>
+
+        <!-- lib/js -->
+        <script src="lib/jquery.js"></script>
+        
+
+    </head>
+
+    <body class="container site-background">
+
+            <div id="contents">
+                
+                <div id="menu-strip"></div>
+
+
+                <!-- Új munkatárs hozzáadása ablak. -->
+                <div class="modal fade" id="new-user-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+
+                        <div class="modal-dialog modal-lg" role="document">
+                                <div class="modal-content">
+
+                                        <div class="modal-header">
+
+                                                <h4 class="modal-title" id="exampleModalLabel">
+                                                        Munkatárs Regisztrációja
+                                                </h4>
+
+                                                <button id='close-user-registration-dialog-btn' type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                </button>
+
+                                        </div> 
+
+                                        <div class="modal-body">
+
+                                            <div class="container">
+
+                                                    <div class="row">
+
+                                                        <div class="form-group col">
+
+                                                            <label for="new-user-email">
+                                                                Email Cím:
+                                                            </label>
+
+                                                            <input type="text" id="new-user-email" class="form-control" placeholder="pld. valaki@dunakanyarhouse.hu"/>
+                                                            
+                                                        </div>
+                                                        
+                                                        <div class="form-group col">
+
+                                                            <label for="new-user-phone">
+                                                                Telefonszám:
+                                                            </label>
+
+                                                            <input type="text" id="new-user-phone" class="form-control" placeholder="pld. +36 70 123 4567"/>
+                                                                
+                                                        </div>                                                        
+
+                                                    </div>    
+                                                    
+                                                    <div class='row'>
+
+                                                            <div class="form-group col">
+
+                                                                    <label for="new-user-lastname">
+                                                                        Vezetéknév:
+                                                                    </label>
+        
+                                                                    <input type="text" id="new-user-lastname" class="form-control" placeholder="pld. Kovács"/>
+                                                                        
+                                                            </div>      
+
+                                                            <div class="form-group col">
+
+                                                                    <label for="new-user-middlename">
+                                                                        Középső Név:
+                                                                    </label>
+        
+                                                                    <input type="text" id="new-user-middlename" class="form-control" placeholder="pld. Mária"/>
+                                                                        
+                                                            </div>
+
+                                                            <div class="form-group col">
+
+                                                                    <label for="new-user-firstname">
+                                                                        Keresztnév:
+                                                                    </label>
+        
+                                                                    <input type="text" id="new-user-firstname" class="form-control" placeholder="pld. Mária"/>
+                                                                        
+                                                            </div>
+
+                                                    </div>
+                                            </div>
+
+                                        </div> 
+
+                                        <div class="modal-footer">
+
+                                                <div class="container">
+
+                                                        <div class="row">
+
+                                                                <div class="alert alert-warning" role="alert">
+                                                                        Figyelem! A hirdetés frissítésével a régi adatok elvesznek.
+                                                                        <br/>
+                                                                        <br/>
+                                                                        <span class="font-weight-bold">
+                                                                            A regisztrációt követően a felhasználó email-t kap a belépéshez szükséges adatokkal.
+                                                                        </span>
+                                                                    </div>
+
+                                                                <span class="col">
+
+                                                                        <button id="cancel-user-registration-btn" class="btn btn-danger float-left mr-3 hvr-grow" type="button">
+                
+                                                                                <span class="fas fa-backspace"></span>
+                                                                                &nbsp;
+                                                                                Mégsem&nbsp;&nbsp;
+                                                                                
+                                                                        </button>
+
+                                                                </span>
+                                                                <span class="col">
+
+                                                                        <button id="confirm-register-user-btn"
+                                                                                type="button" 
+                                                                                class="btn btn-success hvr-grow float-right">
+                                                                                <span class="fas fa-save"></span>
+                                                                                &nbsp;
+                                                                                Regisztráció
+                                                                        </button>
+                                                                </span>
+
+                                                        </div>
+                                                </div>
+
+                                        </div>
+        
+                                </div>
+                        </div>
+
+                </div>
+
+                   <!-- Admin felület. -->
+                   <div class='site-overlayitem mt-2 m-1 p-3'>
+                        <div class='row'>
+
+                            <div class='col pt-2'>
+
+                                
+                                <h4 class='text-center'>
+                                    Üdv, <span  id='logged-in-user-fullname' class='font-weight-bold'>
+                                        Név!<!-- Felhasználói név. -->
+                                    </span>
+                                </h4>
+
+                            </div>
+
+                        </div>
+                        <div class='row text-center'>
+                        
+
+                            <div class='col pt-2'>
+
+                                <!-- Ügyfélmegkeresések. -->
+                                <div class="btn btn-primary hvr-grow site-link-pointer">
+                                    <span class='fa fa-phone'></span>
+                                    &nbsp;&nbsp;
+                                    Ügyfélmegkeresések
+                                </div>
+
+                            </div>
+
+
+                            <div class='col pt-2'>
+
+                                <!-- Munkatárs regisztráció. -->
+                                <div class="btn btn-primary hvr-grow site-link-pointer"
+                                     data-toggle='modal'
+                                     data-target='#new-user-modal'>
+                                        <span class='fa fa-fingerprint'></span>
+                                        &nbsp;&nbsp;
+                                        Munkatárs Regisztráció
+                                </div>
+
+                            </div>
+                            
+
+                    </div>
+
+                    <div class='row'>
+                            <div class='col'>
+                                    <hr class="site-ruler-dotted"/>
+                            </div>
+                    </div>
+
+                    <!-- Saját fiók adatok. -->
+                    <div class='row'>
+
+                            <div class='col pt-2'>
+
+                                    <h4 class='text-center'>
+                                        <span class='fa fa-user-alt'>
+                                        </span>
+                                        &nbsp;&nbsp;
+                                        Fiókod Adatai
+                                    </h4>
+
+                            </div>
+
+                    </div>
+
+                    <div class='row'>
+
+                            <div class='col float-right'>
+
+                                    <table class="table table-striped table-dark">
+                        
+                                            <tbody>
+                    
+                                                    <tr>
+                                                            <td>
+                                                                    <span class="fa fa-hashtag" style="color: crimson;"></span>
+                                                            </td>
+                    
+                                                            <td>
+                                                                    Felh. Név
+                                                            </td>
+                                                            
+                                                            <td class="site-estate-data-point-description">
+                                                                    dtek
+                                                            </td>
+                                                    </tr>
+
+                                                    <tr>
+                                                            <td>
+                                                                    <span class="fa fa-hashtag" style="color: crimson;"></span>
+                                                            </td>
+                    
+                                                            <td>
+                                                                    Hird. Szám:
+                                                            </td>
+                                                            
+                                                            <td class="site-estate-data-point-description">
+                                                                    6
+                                                            </td>
+                                                    </tr>
+
+                                                    <tr>
+                                                            <td>
+                                                                    <span class="fa fa-home" style="color: crimson;"></span>
+                                                            </td>
+                    
+                                                            <td>
+                                                                    Jog. Szint
+                                                            </td>
+                                                            
+                                                            <td class="site-estate-data-point-description">
+                                                                    Tulajdonos
+                                                            </td>
+                                                    </tr>
+                    
+                                                    <tr>
+                                                            <td>
+                                                                    <span class="fa fa-at" style="color: crimson;"></span>
+                                                            </td>
+                    
+                                                            <td>
+                                                                    Email
+                                                            </td>
+                                                            
+                                                            <td class="site-estate-data-point-description">
+                                                                    asdf
+                                                                    <br/>
+                                                                    @dunakanyar.hu
+                                                            </td>
+                                                    </tr>
+                    
+                                                    <tr>
+                                                            <td>
+                                                                    <span class="fa fa-phone" style="color: crimson;"></span>
+                                                            </td>
+                    
+                                                            <td>
+                                                                    Tel.
+                                                            </td>
+                                                            
+                                                            <td class="site-estate-data-point-description">
+                                                                    +36 70 123 4567
+                                                            </td>
+                                                    </tr>
+                    
+                                                    <tr>
+                                                            <td>
+                                                                    <span class="fa fa-comments" style="color: crimson;"></span>
+                                                            </td>
+                    
+                                                            <td>
+                                                                    Megj.
+                                                            </td>
+                                                            
+                                                            <td class="site-estate-data-point-description">
+                                                                    Az oldal fejlesztője.
+                                                            </td>
+
+                                                    </tr>
+                                            </tbody>
+                                    </table>
+
+                            </div>
+
+                        </div>
+                </div>
+
+                <div id="footer-strip"></div>
+                    
+            </div>
+
+    </body>
+
+    <!-- post procesing -->
+    <script src="site/js/script.js"></script>
+    <script src="lib/bootstrap.js"></script>
+
+</html>
