@@ -501,7 +501,7 @@ namespace backend.DataAccess
             {
                 string name = image.Id;
                 string extension = image.Extension;
-                string path = Path.Combine(cd, "Client", "static", name);
+                string path = Path.Combine(cd, name);
                 path += extension;
 
                 File.Delete(path);

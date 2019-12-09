@@ -297,7 +297,7 @@ namespace backend.Controllers
                     string cd = Directory.GetCurrentDirectory();
                     string id = System.Guid.NewGuid().ToString();
                     string extension = Path.GetExtension(image.FileName);
-                    string path = Path.Combine(cd, "Client", "static", id);
+                    string path = Path.Combine(cd, id);
                     path += extension;
 
                     var imageData = new GenericImage();
