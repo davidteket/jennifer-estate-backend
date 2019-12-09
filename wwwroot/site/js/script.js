@@ -12,7 +12,7 @@ window.onload = function () {
             $.get('/Estate/RandomShowcase', null, function(response) {
 
                 var images = JSON.parse(response);
-                var url = '/app/static/';
+                var url = '/static/';
 
                 if (images)
                 {
@@ -34,7 +34,7 @@ window.onload = function () {
             if (id != null) {
                 $.getJSON('/Estate/Detail?estateId=' + id, function(response) {
 
-                    var imgRequestPath = '/app/static/';
+                    var imgRequestPath = '/static/';
                     if (response.Images.length != 0) {
 
                         // Elsődleges kép:
@@ -131,7 +131,7 @@ window.onload = function () {
 
             $("#admin-text").empty();
             $("#admin-text").append("<span id='admin-logo' class='fas fa-cog'></span>&nbsp;&nbsp;Admin Felület");
-            $("#admin-text").attr('href', '/app/admin.html');
+            $("#admin-text").attr('href', '/admin.html');
         }
         else {
             $("#alert-for-logged-in-users").hide();
@@ -191,7 +191,7 @@ function redirectToEstateProfilePage(url)
 //
 function loadEstates() {
 
-    $("#contents").append($("<div>").load("/app/estates.html", null, function() {
+    $("#contents").append($("<div>").load("/estates.html", null, function() {
 
         $("#estate-lister").load("site/shared/estate_lister.html", null, function() {
 
@@ -226,13 +226,13 @@ function loadEstates() {
                         break;
 
                     var j = 0;
-                    var url = '/app/estate-details.html' + '?' + 'estateId=' + estates[i].EstateId;
+                    var url = '/estate-details.html' + '?' + 'estateId=' + estates[i].EstateId;
 
                     row.append($("<span id=" + estates[i].EstateId + " class='col' onclick='redirectToEstateProfilePage(\"" + url + "\")'>").load("site/shared/estate_card.html", null, function(result) {
 
                             var cardId = '#' + estates[j].EstateId;
 
-                            $(cardId).find(".card-img-top").attr('src', '/app/static/' + estates[j].Image);
+                            $(cardId).find(".card-img-top").attr('src', '/static/' + estates[j].Image);
                             $(cardId).find(".estate-card-offertype").append(estates[j].OfferType);
                             $(cardId).find(".estate-card-title").append(estates[j].Title);
                             $(cardId).find(".estate-card-price").append(currencyFormatter.format(estates[j].Price));
@@ -324,7 +324,7 @@ $(document).on('click', '#login-btn', function() {
             $("#add-new-estate").show();
 
             window.setTimeout(function() {
-                window.location.href = '/app/admin.html';
+                window.location.href = '/admin.html';
             }, 2000);
         }
         else {
@@ -344,7 +344,7 @@ $(document).on('click', '#logout-btn', function() {
 
         var result = JSON.parse(response);
         alert(result.Message);
-        window.location.href = '/app/home.html';
+        window.location.href = '/home.html';
 
     });
 
@@ -467,7 +467,7 @@ $(document).on('click', '#upload-estate-btn', function() {
                 var result = JSON.parse(response);
 
                 if (result.Success == true) {
-                    window.location.href = '/app/estate-details.html?estateId=' + result.ItemId;
+                    window.location.href = '/estate-details.html?estateId=' + result.ItemId;
                 }
                 else
                     alert('feltöltés sikertelen');
@@ -506,7 +506,7 @@ $(document).on('click', '#confirm-estate-delete-btn', function() {
         var result = JSON.parse(response);
 
         if (result.ItemId != null) {
-            window.location.href = '/app/estates.html';
+            window.location.href = '/estates.html';
         }
 
     });
@@ -934,7 +934,7 @@ $(document).on('click', '#image-gallery', function(item) {
 
             for (var i = 0; i < images.length; ++i) 
             {
-                var path = '/app/static/' + images[i].Id + images[i].Extension;
+                var path = '/static/' + images[i].Id + images[i].Extension;
                 gallery.push(path);
             }
 
@@ -1086,7 +1086,7 @@ var oldestDate = function(estates) {
 //
 $(document).on('click', '#cheapest-first-btn', function() {
 
-    window.location.href = '/app/estates.html?orderBy=expensiveFirst';
+    window.location.href = '/estates.html?orderBy=expensiveFirst';
 
 });
 
@@ -1106,7 +1106,7 @@ function expensive() {
 //
 $(document).on('click', '#expensive-first-btn', function() {
 
-    window.location.href = '/app/estates.html?orderBy=cheapestFirst';
+    window.location.href = '/estates.html?orderBy=cheapestFirst';
 
 });
 
@@ -1125,7 +1125,7 @@ function cheapest() {
 //
 $(document).on('click', '#newest-first-btn', function() {
 
-    window.location.href = '/app/estates.html?orderBy=oldestFirst';
+    window.location.href = '/estates.html?orderBy=oldestFirst';
 
 });
 
@@ -1146,7 +1146,7 @@ function oldest() {
 //
 $(document).on('click', '#oldest-first-btn', function() {
 
-    window.location.href = '/app/estates.html?orderBy=newestFirst';
+    window.location.href = '/estates.html?orderBy=newestFirst';
     
 });
 
@@ -1206,7 +1206,7 @@ $(document).on('click', '#send-seller-request-btn', function() {
 //
 $(document).on('click', '#more-estate-btn', function() {
 
-    location.href = '/app/estates.html';
+    location.href = '/estates.html';
 
 });
 
