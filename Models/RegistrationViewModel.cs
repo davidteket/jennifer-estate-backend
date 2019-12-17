@@ -1,11 +1,13 @@
-using backend.DataAccess.Entities.Identity;
-
 namespace backend.Models
 {
     public class RegistrationViewModel
     {
-        public User User { get; set; }
-        public backend.DataAccess.Entities.Invitation Invitation { get; set; }
-        public string Password { get; set; }
+        public string Email { get; set; }
+        public string Phone { get; set; }
+        public string FirstName { get; set; } 
+        public string MiddleName { get; set; }
+        public string LastName { get; set; }
+        public string RoleTitle { get; set; }
+        public string Description { get; set; }
     }
 }

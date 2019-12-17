@@ -22,7 +22,7 @@ namespace backend.DataAccess
         List<Estate> GetEstates(int from, int limit);
         List<EstateClient> GetEstateClients();
         List<GenericImage> GetEstateImages(int estateId);
-        string GetProfilePictureId(string employeeId);
+        GenericImage GetProfilePictureId(string employeeId);
         GenericImage GetEstateThumbnail(int estateId);
         List<HeatingSystem> GetHeatingSystems();
         HeatingSystem GetHeatingSystem(int estateId);
@@ -64,6 +64,7 @@ namespace backend.DataAccess
         #region DELETE
 
         bool DeleteEstate(int estateId);
+        bool DeleteAllEntries();
         
         #endregion
     }

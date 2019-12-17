@@ -24,7 +24,7 @@ namespace backend.DataAccess
             var address = ctx.Address.Select(addr => addr)
                              .Where(addr => addr.EstateId == estateId);
             if (address.Count() > 0)
-                result = address.First();
+                result = address.FirstOrDefault();
 
             return result; 
         }
@@ -37,7 +37,7 @@ namespace backend.DataAccess
             var advert = ctx.Advertisement.Select(ad => ad)
                              .Where(ad => ad.EstateId == estateId);
             if (advert.Count() > 0)
-                result = advert.First();
+                result = advert.FirstOrDefault();
 
             return result;                
         }
@@ -51,7 +51,7 @@ namespace backend.DataAccess
                              .Where(e => e.EstateId == estateId);
 
             if (electricity.Count() > 0)
-                result = electricity.First();
+                result = electricity.FirstOrDefault();
 
             return result;                
         }
@@ -63,7 +63,7 @@ namespace backend.DataAccess
                              .Where(w => w.EstateId == estateId);
                              
             if (water.Count() > 0)
-                result = water.First();
+                result = water.FirstOrDefault();
 
             return result;                
         }
@@ -76,7 +76,7 @@ namespace backend.DataAccess
                              .Where(s => s.EstateId == estateId);
                              
             if (service.Count() > 0)
-                result = service.First();
+                result = service.FirstOrDefault();
 
             return result;                
         }
@@ -89,7 +89,7 @@ namespace backend.DataAccess
                              .Where(e => e.Id == estateId);
                              
             if (estate.Count() > 0)
-                result = estate.First();
+                result = estate.FirstOrDefault();
 
             return result;                
         }
@@ -172,10 +172,9 @@ namespace backend.DataAccess
 
             return result;
         }
-        public string GetProfilePictureId(string employeeId) => ctx.GenericImage.Select(image => image)
+        public GenericImage GetProfilePictureId(string employeeId) => ctx.GenericImage.Select(image => image)
                                                                           .Where(image => image.UserId == employeeId)
-                                                                          .First()
-                                                                          .Id;
+                                                                          .FirstOrDefault();
         public GenericImage GetEstateThumbnail(int estateId)
         {
             GenericImage result = null;
@@ -191,7 +190,7 @@ namespace backend.DataAccess
         public List<HeatingSystem> GetHeatingSystems() => ctx.HeatingSystem.ToList();
         public HeatingSystem GetHeatingSystem(int estateId) => ctx.HeatingSystem.Select(hsys => hsys)
                                                                          .Where(hsys => hsys.EstateId == estateId)
-                                                                         .First();
+                                                                         .FirstOrDefault();
         public List<User> GetUsers()
         {
             var result = new List<User>();
@@ -224,6 +223,12 @@ namespace backend.DataAccess
                                         .Where(i => i.EstateId != null)
                                         .ToList();
             int length = images.Count();
+            if (length < 3) {
+                for (int i = 0; i < 3; ++i) 
+                    result.Add("default/no-image.jpg");
+
+                return result;
+            }
 
             for (int i = 0; i < count; ++i) 
             {
@@ -444,57 +449,53 @@ namespace backend.DataAccess
         {   
             bool success = false;
 
-            var advertisement = ctx.Advertisement.Select(a => a)
-                                    .Where(a => a.EstateId == estateId)
-                                    .First();
+            var advertisement = GetAdvertisement(estateId);
+            if (advertisement != null) {
+                ctx.Advertisement.Remove(advertisement);
+                ctx.SaveChanges();
+            }
 
-            ctx.Advertisement.Remove(advertisement);
+            var waterSystem = GetWaterSystem(estateId);
+            if (waterSystem != null) {
+                ctx.WaterSystem.Remove(waterSystem);
+                ctx.SaveChanges();
+            }
 
-            var waterSystem = ctx.WaterSystem.Select(w => w)
-                                    .Where(w => w.EstateId == estateId)
-                                    .First();
+            var publicService = GetPublicService(estateId);
+            if (publicService != null) {
+                ctx.PublicService.Remove(publicService);
+                ctx.SaveChanges();
+            }
 
-            var publicService = ctx.PublicService.Select(p => p)
-                                    .Where(p => p.EstateId == estateId)
-                                    .First();
+            var heatingSystem = GetHeatingSystem(estateId);
+            if (heatingSystem != null) {
+                ctx.HeatingSystem.Remove(heatingSystem);
+                ctx.SaveChanges();
+            }
 
-            var heatingSystem = ctx.HeatingSystem.Select(h => h)
-                                    .Where(h => h.EstateId == estateId)
-                                    .First();
+            var electricity = GetElectricity(estateId);
+            if (electricity != null) {
+                ctx.Electricity.Remove(electricity);
+                ctx.SaveChanges();
+            }
 
-            var electricity = ctx.Electricity.Select(e => e)
-                                    .Where(e => e.EstateId == estateId)
-                                    .First();
+            var address = GetAddress(estateId);
+            if (address != null) {
+                ctx.Address.Remove(address);
+                ctx.SaveChanges();
+            }
 
-            var address = ctx.Address.Select(a => a)
-                                    .Where(a => a.EstateId == estateId)
-                                    .First();
+            var images = GetEstateImages(estateId);
+            if (images != null) {
+                ctx.GenericImage.RemoveRange(images);
+                ctx.SaveChanges();
+            }
 
-            var images = ctx.GenericImage.Select(gi => gi)
-                                         .Where(gi => gi.EstateId == estateId)
-                                         .ToList();
-
-            var estate = ctx.Estate.Select(e => e)
-                                    .Where(e => e.Id == estateId)
-                                    .First();
-
-            ctx.WaterSystem.Remove(waterSystem);                                    
-            ctx.SaveChanges();
-            ctx.PublicService.Remove(publicService);
-            ctx.SaveChanges();
-            ctx.HeatingSystem.Remove(heatingSystem);
-            ctx.SaveChanges();
-            ctx.Electricity.Remove(electricity);
-            ctx.SaveChanges();
-            ctx.Address.Remove(address);
-            ctx.SaveChanges();
-            ctx.GenericImage.RemoveRange(images);
-            ctx.SaveChanges();
-            ctx.Estate.Remove(estate);
-            int affected = ctx.SaveChanges();
-
-            if (affected == 1)
-                success = true;
+            var estate = GetEstate(estateId);
+            if (estate != null) {
+                ctx.Estate.Remove(estate);
+                ctx.SaveChanges();
+            }
 
             string cd = Directory.GetCurrentDirectory();
             foreach(GenericImage image in images)
@@ -533,6 +534,7 @@ namespace backend.DataAccess
         public void AddClientRequest(ClientRequest clientRequest)
         {
             ctx.ClientRequest.Add(clientRequest);
+            ctx.SaveChanges();
         }
 
         public bool DeleteEmployee(string employeeId)
@@ -543,6 +545,33 @@ namespace backend.DataAccess
             //
 
             // TODO
+            
+
+            return success;
+        }
+
+        public bool DeleteAllEntries()
+        {
+            bool success = false;
+
+            List<Estate> estates = ctx.Estate.Select(e => e).ToList();
+            foreach (Estate estate in estates)
+                this.DeleteEstate(estate.Id);
+
+            List<User> employees = ctx.User.Select(u => u).Where(u => u.UserName.ToUpper() != Startup.DeveloperUser.ToUpper()).ToList();
+            foreach (User employee in employees) 
+            {
+                var deleteUserTask = Startup.UserManager.DeleteAsync(employee);
+                deleteUserTask.Wait();
+
+            }
+
+            List<UserRole> roles = ctx.UserRole.Select(r => r).Where(r => r.NormalizedName != Startup.DeveloperRole.ToUpper()).ToList();
+            foreach (UserRole role in roles)
+            {
+                var deleteRoleTask = Startup.RoleManager.DeleteAsync(role);
+                deleteRoleTask.Wait();
+            }
             
 
             return success;

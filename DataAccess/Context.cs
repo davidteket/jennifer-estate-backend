@@ -3,11 +3,16 @@ using Microsoft.EntityFrameworkCore;
 
 using backend.DataAccess.Entities;
 using backend.DataAccess.Entities.Identity;
+using backend.Services;
 
 namespace backend.DataAccess
 {
     public class JenniferEstateContext : IdentityDbContext<User, UserRole, string>
     {
+        private Serializer _serializer;
+        
+        // Entitások
+        //
         public DbSet<Address> Address { get; set; }
         public DbSet<Advertisement> Advertisement { get; set; }
         public DbSet<ClientRequest> ClientRequest { get; set; }
@@ -21,18 +26,19 @@ namespace backend.DataAccess
         public DbSet<WaterSystem> WaterSystem { get; set; }
         public DbSet<CompanyDetails> CompanyDetails { get; set; }
         public DbSet<Invitation> Invitation { get; set; }
-
-        // Identity
-        //
         public DbSet<Role> Role { get; set; }
         public DbSet<UserClaim> Claim { get; set; }
         public DbSet<UserLogin> Login { get; set; }
         public DbSet<User> User { get; set; }
+        public DbSet<UserRole> UserRole { get; set; }
 
         public JenniferEstateContext(DbContextOptions options) : base(options)
         {
+            _serializer = new Serializer();
             if (this.Database.CanConnect())
-                System.Console.WriteLine("Adatbázis kontextus létrehozva, a csatlakozás lehetséges.");
+                System.Console.WriteLine(_serializer.GetServerLogMessage("CanConnectToDatabase"));
+            else
+                System.Console.WriteLine(_serializer.GetServerLogMessage("CannotConnectToDatabase"));
         }
     }
 }

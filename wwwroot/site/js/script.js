@@ -92,6 +92,8 @@ window.onload = function () {
         });
 
     $("#search-module").load("site/shared/search_module.html", function() {
+            $('#search-module-container').hide();
+
         $("#add-new-estate").hide();   
     });
 
@@ -114,6 +116,8 @@ window.onload = function () {
 
     $("#footer-strip").load("site/shared/footer_strip.html", null, function() {
         $("#invalid-credentials-login").hide();
+        $("#waiting-for-authorization").hide();
+        $("#valid-credentials-login").hide();
     });
 
     // Authorizált.
@@ -123,7 +127,7 @@ window.onload = function () {
         if (data.ItemId != null) 
         {
             $("#add-new-estate").show();
-            $("#login-modal-popup").empty().replaceWith("<h5 id='logout-btn' class='small col site-link-pointer hvr-underline-from-center pb-2 pt-2'><span class='fas fa-sign-out-alt'></span></span>&nbsp;&nbsp;Kijelentkezés</h5>");
+            $("#login-modal-popup").empty().replaceWith("<h5 id='logout-btn' class='small btn btn-link col site-link-pointer pb-2 pt-2'><span class='fas fa-sign-out-alt'></span></span>&nbsp;&nbsp;Kijelentkezés</h5>");
             $("#alert-for-logged-in-users").hide();
             $("#upload-estate-images-btn").show();
             $("#edit-estate-btn").show();
@@ -132,6 +136,46 @@ window.onload = function () {
             $("#admin-text").empty();
             $("#admin-text").append("<span id='admin-logo' class='fas fa-cog'></span>&nbsp;&nbsp;Admin Felület");
             $("#admin-text").attr('href', '/admin.html');
+
+            // Admin felület.
+            //
+            if($('.admin').length) {
+                $.getJSON('/Employee/Details?employeeId=' + data.ItemId, function(response) {
+
+                    if (response.EmployeeId == data.ItemId)
+                    {
+                        /*
+                        ProfilePictureId: "default/no-image.jpg"    <-- TODO
+                        */
+
+                        $('#logged-in-user-fullname').text((response.ApproachType == null ? "" : response.ApproachType) + " " + response.LastName + " " + response.FirstName);
+                        $('#user-profile-username').text(response.UserName);
+                        $('#user-profile-adcount').text(response.AdvertisementCount);
+                        var roles = "";
+                        for (var i = 0; i < response.EmployeeRoles.length; ++i) {
+                            if ((i + 1) < response.EmployeeRoles.length)
+                                roles += response.EmployeeRoles[i] + ", ";
+                            else 
+                                roles += response.EmployeeRoles[i] + ".";
+                        }
+                        $('#user-profile-roles').text(roles);
+                        $('#user-profile-email').text(response.Email);
+                        $('#user-profile-phone').text(response.Phone == null ? "Nincs megadva." : response.Phone);
+                        $('#user-profile-description').text(response.Description == null ? "Nincs megadva." : response.Description);
+                        $('#user-profile-profilepicture').attr('src', '/static/' + response.ProfilePictureId);
+
+                        $('#dbase-erease-inprogress').hide();
+                        $('#dbase-erease-error').hide();
+                        $('#dbase-erease-success').hide();
+                        $('#role-added-message').hide();
+                    }
+                    else {
+                        $('#add-new-role-btn').hide();
+                        $('#erease-dbase-btn').hide();
+                    }
+
+                });
+            }
         }
         else {
             $("#alert-for-logged-in-users").hide();
@@ -222,13 +266,13 @@ function loadEstates() {
 
                 for(var i = 0; i < estates.length; ++i) 
                 {
-                    if ($('.home').length && i == 3)
+                    if ($('.home').length && i == 4)
                         break;
 
                     var j = 0;
                     var url = '/estate-details.html' + '?' + 'estateId=' + estates[i].EstateId;
 
-                    row.append($("<span id=" + estates[i].EstateId + " class='col' onclick='redirectToEstateProfilePage(\"" + url + "\")'>").load("site/shared/estate_card.html", null, function(result) {
+                    row.append($("<div id=" + estates[i].EstateId + " class='col-sm-3 float-left' onclick='redirectToEstateProfilePage(\"" + url + "\")'>").load("site/shared/estate_card.html", null, function(result) {
 
                             var cardId = '#' + estates[j].EstateId;
 
@@ -301,6 +345,7 @@ $(document).on('click', '.tag', function(elem)
 $(document).on('click', '#login-btn', function() {
 
     $("#invalid-credentials-login").hide(500);
+    $("#waiting-for-authorization").show(1000);
 
     var username = $("#username").val();
     var password = $("#password").val();
@@ -319,8 +364,9 @@ $(document).on('click', '#login-btn', function() {
 
         if (result.Success == true) {
 
-            $("#login-btn").addClass("btn-success");
-            $("#login-btn").html(result.Message)
+            $("#waiting-for-authorization").hide(500);
+            $("#valid-credentials-login").show(1000);
+
             $("#add-new-estate").show();
 
             window.setTimeout(function() {
@@ -329,6 +375,7 @@ $(document).on('click', '#login-btn', function() {
         }
         else {
 
+            $("#waiting-for-authorization").hide(500);
             $("#invalid-credentials-login").show(1000);
 
         }
@@ -1220,3 +1267,123 @@ $(document).on('click', '#cancel-user-registration-btn', function() {
 
 // Munkatárs regisztráció.
 //
+$(document).on('click', '#register-user-btn', function() {
+
+    $('#new-user-role').empty();
+    $.getJSON('/Employee/GetRoles', null, function(response) {
+
+        for (var i = 0; i < response.length; ++i)
+            $('#new-user-role').append("<option>" + response[i] + "</option>");
+    });
+
+});
+
+// Munkatárs regisztráció megerősítés.
+//
+$(document).on('click', '#confirm-register-user-btn', function() {
+
+    var registration = {
+
+        Email: $('#new-user-email').val(),
+        Phone: $('#new-user-phone').val(),
+        FirstName: $('#new-user-firstname').val(),
+        MiddleName: $('#new-user-middlename').val(),
+        LastName: $('#new-user-lastname').val(),
+        RoleTitle: $('#new-user-role').val(),
+        Description: $('#new-user-description').val()
+
+    };
+
+    $.post('/Employee/Registration', JSON.stringify(registration), function(response) {
+
+        var result = JSON.parse(response);
+
+        if (result.Success == true) {
+            alert('sikeres regisztráció..');
+        }
+
+    });
+
+});
+
+
+// Kereső megjelenítése.
+//
+$(document).on('click', '#search-btn', function() {
+
+    $('.search-btn-container').hide(500);
+    $('#search-module-container').show(1000);
+
+});
+
+// Kereső elrejtése.
+//
+$(document).on('click', '#hide-simple-search-container', function() {
+
+    $('#search-module-container').hide(500);
+    $('.search-btn-container').show(1000);
+
+});
+
+// Adatbázis adatok törlése - megszakítás.
+//
+$(document).on('click', '#cancel-erease-database-btn', function() {
+
+    $('#close-erease-database-btn').click();
+
+});
+
+// Adatbázis adatok törlése - jóváhagyás.
+//
+$(document).on('click', '#confirm-erease-database-btn', function() {
+
+    $('#dbase-erease-alert').hide(500);
+    $('#dbase-erease-inprogress').show(1000);
+
+    $.getJSON('/Application/FactoryReset', null, function(response) {
+
+        if (response.Success == true) {
+            $('#dbase-erease-inprogress').hide(500);
+            $('#dbase-erease-success').show(1000);
+            window.setTimeout(function() {
+                window.location.href = '/home.html';
+            }, 2000);
+        }
+        else {
+            $('#dbase-erease-inprogress').hide(500);
+            $('#dbase-erease-error').show(1000);
+            window.setTimeout(function() {
+                window.location.href = '/home.html';
+            }, 2000);
+        }
+
+    });
+
+});
+
+// Új jogosultság hozzáadása - megszakítás.
+//
+$(document).on('click', '#cancel-new-role-btn', function() {
+
+    $('#close-new-role-btn').click();
+
+});
+
+// Új jogosultság hozzáadása.
+//
+$(document).on('click', '#confirm-new-role-btn', function() {
+
+    var role = $('#role-name').val();
+    $.post('/Employee/NewRole?roleTitle=' + role, null, function(response) {
+
+        var result = JSON.parse(response);
+        if (result.Success == true) {
+            $('#role-added-message').show(1000);
+            window.setTimeout(function() {
+                window.location.href = '/admin.html';
+            }, 2000);
+        }
+
+    });
+
+});

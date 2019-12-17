@@ -1,0 +1,100 @@
+{
+    "Email" : {
+
+        "Host" : "smtp.gmail.com",
+        "Port" : 587,
+        "Sender" : "januspannonius1011@gmail.com",
+        "EnableSSL" : true,
+        "Password" : "valami888__",
+
+        "Templates" : {
+
+            "Registration" : {
+
+                "Subject" : "{0} - Regisztráció",
+                "Body" : "<h3>Kedves, {0}!</h3><p>A jelen email tartalmazza a belépésedhez szükséges adatokat. Kérjük, hogy az első belépés után változtasd meg jelszavadat!<br/><br/><b>felhasználói neved:</b>&nbsp;{1}<br/><b>jelszavad:</b>&nbsp;{2}<br/><br/><b>jogosultsági szinted:</b>&nbsp;{3}<br/><br/>A belépéshez kérjük látogasd meg weboldalunkat:&nbsp;{4}<br/><br/>Üdvözlettel:<br/><b>{5}</b></p>"
+
+            }
+        }
+    },
+
+    "Application" : {
+
+        "Name" : "Dunakanyar House Ingatlan",
+        "URL" : "https://localhost/home.html",
+        "Owner" : "Novák Jennifer",
+        "Logo" : "default/no-image.jpg",
+        "DeployConnectionString" : "Server=tcp:dunakanyarhouse-prod-db.database.windows.net,1433;Initial Catalog=dunakanyarhouse-prod-db;Persist Security Info=False;User ID=caribou;Password=R239Aq///;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;",
+        "DeveloperConnectionString" : "Server=localhost;Database=JenniferEstate;User Id=SA;Password=valami888__;",
+        "User" : "root",
+        "Password" : "R239Aq///",
+        "Role" : "developer",
+        "FirstName" : "David",
+        "LastName" : "Teket",
+        "Email" : "januspannonius1011@gmail.com",
+
+        "ServerLog" : {
+
+            "RootUserExists" : "Létezik root felhasználó.",
+            "RootUserCreated" : "Root felhasználó sikeresen létrehozva.",
+            "RootUserError" : "Hiba a root felhasználó létrehozása közben.",
+            "RootRoleCreated" : "Root jogosultság sikeresen létrehozva.",
+            "RootRoleError" : "Hiba a root jogosultság létrehozása közben.",
+            "RootUserToRootRole" : "Root felhasználó root joghoz adva.",
+            "RootUserToRootRoleError" : "Hiba a root felhasználó root joghoz rendelése közben.",
+            "RootRoleRequiredError" : "Új jogosultság létrehozásához root jogosultság szükséges.",
+            "RootRoleToUserRequiredError" : "Új felhasználó létrehozásához root jogosultság szükséges.",
+
+            "EmployeeListRetrievalError" : "A felhasználók lekérdezése sikertelen volt.",
+            "EmployeeIdMissingError" : "Nincs megadva felhasználói azonosító.",
+            "EmployeeIdIncorrectError" : "A megadott felhasználói azonosító nem érvényes.",
+            "EmployeeIdRetrieved" : "Felhasználói azonosító sikeresen lekérve.",
+            "EmployeeIdRetrievalError" : "Hiba történt a felhasználói azonosító lekérése közben.",
+            "EmployeeError" : "Nem sikerült létrehozni a felhasználót.",
+            "EmployeeCreated" : "A felhasználói regisztráció sikeresen megtörtént.",
+            "EmployeeReceivedRole" : "A felhasználó {0} jogosultságot kapott.",
+            "EmployeeRoleError" : "A felhasználó jogosultsági beállítása sikertelen volt.",
+            "EmployeeProfileUpdated" : "A felhasználói profil módosítása sikeresen megtörtént.",
+            "EmployeeRetrievalError" : "Hiba a felhasználó lekérdezése közben",
+            "EmployeeDeleteError" : "A megadott azonosítójú felhasználó törlése sikertelen volt.",
+            "EmployeeDelete" : "A felhasználó törlése sikeresen megtörtént.",
+            "EmployeeRoleNotHighEnough" : "Ez a felhasználó nem jogosult a tranzakció végrehajtására.",
+
+            "AuthenticationRequiredError" : "Bejelentkezés szükséges.",
+            "Authentication" : "A bejelentkezés sikeresen megtörtént.",
+            "AuthenticationPasswordError" : "A megadott jelszó érvénytelen volt.",
+            "AuthenticationUserError" : "A bejelentkezés sikertelen volt, vagy nem létezik a megadott felhasználó.",
+            "AuthenticationLoggedOut" : "A kijelentkezés megtörtént.",
+            "AuthenticationLoggedOutError" : "Hiba történt kijelentkezéskor.",
+
+            "RoleTitleUnavailableError" : "Nincs megadva jogosultsági cím.",
+            "RoleTitleCreated" : "A jogosultság létrehozásra került.",
+            "RoleTitleError" : "A jogosultság létrehozása sikertelen volt.",
+
+            "EmailNotificationError" : "Regisztrációs email kiküldése sikertelen.",
+            "EmailNotification" : "Regisztrációs email kiküldve.",
+
+            "AdvertisementUpdated" : "A hirdetés sikeresen módosítva lett.",
+            "AdvertisementUpdateError" : "Hiba történt a hirdetés módosítása közben.",
+            "AdvertisementImageUploaded" : "A képfeltöltés sikeresen megtörtént.",
+            "AdvertisementImageUploadError" : "Sikertelen képfeltöltés.",
+
+            "SellerRequestPersisted" : "Az értékesítési szándék rögzítésre került.",
+
+            "ApplicationDataErease" : "Az alkalmazás adatok törlése sikeresen megtörtént.",
+            "ApplicationDataEreaseError" : "Hiba történt az alkalmazás adatok törlése közben.",
+
+            "CanConnectToDatabase" : "Az adatbázis elérhető, lehetséges a csatlakozás.",
+            "CannotConnectToDatabase" : "Az adatbázis nem elérhető, nem lehetséges a csatlakozás."
+
+        },
+
+        "Defaults" : {
+
+            "Picture" : "default/no-image.jpg",
+            "TmpPassRegularCharPool" : "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.",
+            "TmpPassSpecialCharPool" : "$#>+-/*_?"
+
+        }
+    }
+}

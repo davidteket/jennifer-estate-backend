@@ -1,18 +1,95 @@
+using backend.Services;
 using backend.DataAccess.Entities.Identity;
 using backend.DataAccess;
 using backend.Models;
 
 using Microsoft.AspNetCore.Mvc;
+
 using Newtonsoft.Json;
 
 using System.Collections.Generic;
-using System.Net.Mail;
+using System.Linq;
 
 namespace backend.Controllers
 {
     public class EmployeeController : Controller
     {
-        private IRepository repo = new Repository();
+        private IRepository _repo = new Repository();
+        private Serializer _serialize = new Serializer();
+        private Email _email = new Email();
+
+        #region Utility
+
+        // Ideiglenes jelszó generálás.
+        //
+        private string GeneratePassword()
+        {
+            string result = null;
+
+            int minLength = 8;
+            int maxLength = 16;
+            string pool = _serialize.GetDefaults("TmpPassRegularCharPool");
+            string spec = _serialize.GetDefaults("TmpPassSpecialCharPool");
+
+            var rnd = new System.Random();
+            int length = rnd.Next(minLength, maxLength);
+
+            for (int i = 0; i < length; ++i) {
+                int j = rnd.Next(0, pool.Length - 1);
+                int k = rnd.Next(0, 1);
+                int l = rnd.Next(0, 1);
+                int m = rnd.Next(0, 1);
+
+                bool isUpper = k == 1 ? true : false;
+                bool addNumber = l == 1 ? true : false;
+                int s = rnd.Next(0, spec.Length - 1);
+
+                string chunk = isUpper ? pool[j].ToString().ToUpper() : pool[j].ToString();
+                chunk += addNumber ? i.ToString() : "0";
+                chunk += spec[s].ToString();
+
+                result += chunk;
+            }
+
+            return result;
+        }
+
+        // Felhasználói név generálás.
+        //
+        private string GenerateUserName(string firstName, string lastName)
+        {
+            string result = null;
+            int ext = 1;
+
+            byte[] firstNameBuffer;
+            firstNameBuffer = System.Text.Encoding.GetEncoding("ISO-8859-8").GetBytes(firstName);
+            firstName = System.Text.Encoding.UTF8.GetString(firstNameBuffer);
+
+            byte[] lastNameBuffer;
+            lastNameBuffer = System.Text.Encoding.GetEncoding("ISO-8859-8").GetBytes(lastName);
+            lastName = System.Text.Encoding.UTF8.GetString(lastNameBuffer);
+
+            while (true) 
+            {
+                string toCheck = firstName + "." + lastName + ext.ToString();
+                var getUserTask = Startup.UserManager.FindByNameAsync(toCheck);
+                getUserTask.Wait();
+
+                if (getUserTask.IsCompletedSuccessfully && getUserTask.Result != null)
+                    ++ext;
+                else 
+                {
+                    byte[] usernameBuffer;
+                    usernameBuffer = System.Text.Encoding.GetEncoding("ISO-8859-8").GetBytes(toCheck);
+                    result = System.Text.Encoding.UTF8.GetString(usernameBuffer);
+                    break;
+                } 
+            }
+
+            return result.ToLower();
+        }
+
+        #endregion
 
         #region WebAPI GET
 
@@ -49,9 +126,10 @@ namespace backend.Controllers
 
                 response = JsonConvert.SerializeObject(overviews);
             }
-            else
-                response = "A profil adatok lekérdezése sikertelen volt.";
-
+            else{
+                response = _serialize.GetServerLogMessage("EmployeeRetrievalError");
+                // LOG - red
+            }
 
             return response;
         }
@@ -65,7 +143,7 @@ namespace backend.Controllers
 
             var details = new EmployeeDetailsViewModel();
             if (employeeId == null) {
-                response = "Nincs megadva azonosító.";
+                response = _serialize.GetServerLogMessage("EmployeeIdIncorrectError");
                 goto cancelBio;
             }
             else {
@@ -82,15 +160,31 @@ namespace backend.Controllers
                     details.FirstName = user.FirstName;
                     details.MiddleName = user.MiddleName;
                     details.LastName = user.LastName;
+                    details.UserName = user.UserName;
                     details.Phone = user.PhoneNumber;
                     details.Email = user.Email;
-                    details.Advertisements = null; // TODO
-                    details.ProfilePictureId = "TODO";
+                    details.Description = user.Description;
+                    details.AdvertisementCount = _repo.GetAdvertisements().Where(a => a.AdvertiserId == user.Id).Count();
+                    var image = _repo.GetProfilePictureId(user.Id);
+                    if (image == null) {
+                        details.ProfilePictureId = _serialize.GetDefaults("Picture");
+                    }
+                    else
+                        details.ProfilePictureId = image.Id + image.Extension;
+
+                    var getUserRoleTask = Startup.UserManager.GetRolesAsync(user);
+                    getUserRoleTask.Wait();
+
+                    if (getUserRoleTask.IsCompletedSuccessfully && getUserRoleTask.Result != null)
+                        details.EmployeeRoles = getUserRoleTask.Result.ToList();
+                    
 
                     response = JsonConvert.SerializeObject(details);
                 }
-                else
-                    response = "A megadott azonosító nem érvényes.";
+                else {
+                    response = _serialize.GetServerLogMessage("EmployeeRetrievalError");
+                    // LOG - red
+                }
             }
 
             cancelBio:
@@ -109,11 +203,29 @@ namespace backend.Controllers
 
             if (getUserTask.IsCompletedSuccessfully && getUserTask.Result != null) {
                 response.ItemId = getUserTask.Result.Id;
-                response.Message = "Felhasználói azonosító sikeresen lekérve.";
+                response.Message = _serialize.GetServerLogMessage("EmployeeIdRetrieved");
                 response.Success = true;
+
+                // LOG - green
             }
-            else 
-                response.Message = "Hiba történt a felhasználói azonosító lekérése közben.";
+            else {
+                response.Message = _serialize.GetServerLogMessage("EmployeeRetrievalError");
+
+                // LOG - red
+            }
+
+            return JsonConvert.SerializeObject(response);
+        }
+
+        [HttpGet]
+        // Jogosultságok.
+        //
+        public string GetRoles()
+        {
+            var response = new List<string>();
+
+            if (Startup.SignInManager.IsSignedIn(User))
+                response = Startup.RoleManager.Roles.Select(r => r.Name).ToList();
 
             return JsonConvert.SerializeObject(response);
         }
@@ -129,15 +241,36 @@ namespace backend.Controllers
         {
             var response = new ItemPostedResultModel();
 
-            //if (!Startup.SignInManager.IsSignedIn(User)) {
-            //    response.Message = "Bejelentkezés szükséges.";
-            //    goto cancelNewRole;
-            //}
+            bool allowed = false;
+            if (!Startup.SignInManager.IsSignedIn(User)) {
+                response.Message = _serialize.GetServerLogMessage("AuthenticationRequiredError");
+                goto cancelNewRole;
+            }
+            else {
+                string username = this.User.Identity.Name;
+                var getUserTask = Startup.UserManager.FindByNameAsync(username);
+                getUserTask.Wait();
+
+                if (getUserTask.IsCompletedSuccessfully && getUserTask.Result != null) {
+                    var getRolesTask = Startup.UserManager.GetRolesAsync(getUserTask.Result);
+                    getRolesTask.Wait();
+
+                    if (getRolesTask.IsCompletedSuccessfully && getRolesTask.Result != null) {
+                        List<string> roles = getRolesTask.Result.ToList();
+                        allowed = roles.Any(r => r.ToUpper() == Startup.DeveloperRole.ToUpper());
+                    }
+                }
+            }
+
+            if (allowed == false) {
+                response.Message = _serialize.GetServerLogMessage("RootRoleRequiredError");
+                goto cancelNewRole;
+            }
 
             var role = new UserRole();
 
             if (roleTitle == null) {
-                response.Message = "Nincs megadva jogosultsági cím.";
+                response.Message = _serialize.GetServerLogMessage("RoleTitleUnavailableError");
                 goto cancelNewRole;
             }
             else 
@@ -148,12 +281,12 @@ namespace backend.Controllers
 
             if (addRoleTask.IsCompletedSuccessfully && addRoleTask.Result.Succeeded)
             {
-                response.Message = "A jogosultság létrehozásra került.";
+                response.Message = _serialize.GetServerLogMessage("RoleTitleCreated");
                 response.Success = addRoleTask.Result.Succeeded;
                 response.ItemId = role.Name;
             }
             else 
-                response.Message = "A jogosultság létrehozása sikertelen volt.";
+                response.Message = _serialize.GetServerLogMessage("RoleTitleError");
 
             cancelNewRole:
             return JsonConvert.SerializeObject(response);
@@ -166,10 +299,31 @@ namespace backend.Controllers
         {
             var response = new ItemPostedResultModel();
 
-            //if (!Startup.SignInManager.IsSignedIn(User)) {
-            //    response.Message = "Bejelentkezés szükséges.";
-            //    goto cancelRegistration;
-            //}
+            bool allowed = false;
+            if (!Startup.SignInManager.IsSignedIn(User)) {
+                response.Message = _serialize.GetServerLogMessage("AuthenticationRequiredError");
+                goto cancelRegistration;
+            }
+            else {
+                string username = this.User.Identity.Name;
+                var getUserTask = Startup.UserManager.FindByNameAsync(username);
+                getUserTask.Wait();
+
+                if (getUserTask.IsCompletedSuccessfully && getUserTask.Result != null) {
+                    var getRolesTask = Startup.UserManager.GetRolesAsync(getUserTask.Result);
+                    getRolesTask.Wait();
+
+                    if (getRolesTask.IsCompletedSuccessfully && getRolesTask.Result != null) {
+                        List<string> roles = getRolesTask.Result.ToList();
+                        allowed = roles.Any(r => r.ToUpper() == Startup.DeveloperRole.ToUpper());
+                    }
+                }
+            }
+
+            if (allowed == false) {
+                response.Message = _serialize.GetServerLogMessage("RootRoleToUserRequiredError");
+                goto cancelRegistration;
+            }
             
             var user = new DataAccess.Entities.Identity.User();
 
@@ -185,48 +339,49 @@ namespace backend.Controllers
             {
                 data = System.Text.Encoding.Default.GetString(buffer);
                 registration = (RegistrationViewModel) JsonConvert.DeserializeObject(data, typeof(RegistrationViewModel));
-
-                /*bool hasBeenInvited = repo.CheckInvitationStatus(registration.Invitation);
-                if (hasBeenInvited == false) {
-                    response.Message = "Az oldalra csak meghívással lehet regisztrálni. A megadott meghívó azonosító érvénytelen.";
-                    goto cancelRegistration;
-                }*/
             }
 
-            var createUserTask = Startup.UserManager
-                                        .CreateAsync(registration.User, registration.Password);
+            string tempPassword = GeneratePassword();
+            string userName = GenerateUserName(registration.FirstName, registration.LastName);
+
+            user.Description = registration.Description;
+            user.Email = registration.Email;
+            user.FirstName = registration.FirstName;
+            user.MiddleName = registration.MiddleName;
+            user.LastName = registration.LastName;
+            user.PhoneNumber = registration.Phone;
+            user.UserName = userName;
+
+            var createUserTask = Startup.UserManager.CreateAsync(user, tempPassword);
             createUserTask.Wait();
 
             if (!createUserTask.IsCompletedSuccessfully || !createUserTask.Result.Succeeded) {
                 response = new ItemPostedResultModel();
-                response.Message = "A felhasználói regisztráció sikertelen volt. Kérlek próbáld meg újra, vagy vedd fel a kapcsolatot az oldal üzemeltetőjével!";
+                response.Message = _serialize.GetServerLogMessage("EmployeeError");
             }
             else 
             {
-                var getUserIdTask = Startup.UserManager.GetUserIdAsync(registration.User);
-                getUserIdTask.Wait();
+                var getUserTask = Startup.UserManager.FindByNameAsync(user.UserName);
+                getUserTask.Wait();
 
-                if (getUserIdTask.IsCompletedSuccessfully) 
+                if (getUserTask.IsCompletedSuccessfully && getUserTask.Result != null) 
                 {
-                    response.ItemId = getUserIdTask.Result;
-                    response.Success = createUserTask.Result.Succeeded;
-                    response.Message = "A felhasználói regisztráció sikeresen megtörtént.";
+                    User newUser = getUserTask.Result;
+                    response.ItemId = newUser.Id;
+                    response.Message = _serialize.GetServerLogMessage("EmployeeCreated");
 
-                    var getUserTask = Startup.UserManager.FindByIdAsync(getUserIdTask.Result);
-                    getUserTask.Wait();
+                    var addToRoleTask = Startup.UserManager.AddToRoleAsync(newUser, registration.RoleTitle);
+                    addToRoleTask.Wait();
 
-                    if (getUserTask.IsCompletedSuccessfully && getUserTask.Result != null) {
-                        var addToRoleTask = Startup.UserManager.AddToRoleAsync(getUserTask.Result, "employee");
-                        addToRoleTask.Wait();
-
-                        if (addToRoleTask.IsCompletedSuccessfully && addToRoleTask.Result != null)
-                            response.Message += "\n A felhasználó dolgozói jogosultságot kapott.";
-                        else
-                            response.Message += "\n A felhasználó jogosultsági beállítása sikertelen volt.";
-
+                    if (addToRoleTask.IsCompletedSuccessfully && addToRoleTask.Result != null) {
+                        response.Message += _serialize.GetServerLogMessage("EmployeeReceivedRole").Replace("{0}", registration.RoleTitle);
+                        response.Success = _email.NotifyRegistration(user.Email, string.Concat(user.LastName, " ", user.FirstName), user.UserName, tempPassword, registration.RoleTitle);
+                        response.Message += response.Success ? _serialize.GetServerLogMessage("EmailNotification") : _serialize.GetServerLogMessage("EmailNotificationError");
                     }
-
-                    //repo.InvalidateInvitationTicket(registration.Invitation.Id);
+                    else {
+                        response.Message += _serialize.GetServerLogMessage("EmployeeRoleError");
+                        response.Success = false;
+                    }
                 }
             }
 
@@ -273,14 +428,14 @@ namespace backend.Controllers
                     if (signInTask.IsCompletedSuccessfully) {
                         response.ItemId = user.Id;
                         response.Success = true;
-                        response.Message = "A bejelentkezés sikeresen megtörtént.";
+                        response.Message = _serialize.GetServerLogMessage("Authentication");
                     }
                 }
                 else 
-                    response.Message = "A megadott jelszó érvénytelen volt. Próbáld meg újra, vagy vedd fel a kapcsolatot az oldal adminisztrátorával.";
+                    response.Message = _serialize.GetServerLogMessage("AuthenticationPasswordError");
             }
             else
-                response.Message = "A bejelentkezés sikertelen volt, vagy nem létezik a megadott felhasználó. Próbáld meg újra, vagy vedd fel a kapcsolatot az oldal üzemeltetőjével.";
+                response.Message = _serialize.GetServerLogMessage("AuthenticationUserError");
 
             return JsonConvert.SerializeObject(response);
         }
@@ -293,7 +448,7 @@ namespace backend.Controllers
             var response = new ItemPostedResultModel();
 
             if (!Startup.SignInManager.IsSignedIn(User)) {
-                response.Message = "Bejelentkezés szükséges.";
+                response.Message = _serialize.GetServerLogMessage("AuthenticationRequiredError");
                 goto cancelLogout;
             }
 
@@ -301,9 +456,9 @@ namespace backend.Controllers
             signOutTask.Wait();
 
             if (signOutTask.IsCompletedSuccessfully)
-                response.Message = "A kijelentkezés megtörtént.";
+                response.Message = _serialize.GetServerLogMessage("AuthenticationLoggedOut");
             else
-                response.Message = "Hiba történt kijelentkezéskor.";
+                response.Message = _serialize.GetServerLogMessage("AuthenticationLoggedOutError");
 
             cancelLogout: 
             return JsonConvert.SerializeObject(response);
@@ -317,13 +472,7 @@ namespace backend.Controllers
             var response = new ItemPostedResultModel();
 
             if (!Startup.SignInManager.IsSignedIn(User)) {
-                response.Message = "Bejelentkezés szükséges.";
-                goto cancelUpdateBio;
-            }
-
-            if (!Startup.SignInManager.IsSignedIn(new System.Security.Claims.ClaimsPrincipal(HttpContext.User.Identity)))
-            {
-                response.Message = "A művelet elvégzéséhez bejelentkezés szükséges.";
+                response.Message = _serialize.GetServerLogMessage("AuthenticationRequiredError");
                 goto cancelUpdateBio;
             }
 
@@ -361,75 +510,16 @@ namespace backend.Controllers
                 if (updateUserTask.IsCompletedSuccessfully && updateUserTask.Result.Succeeded) {
                     response.ItemId = user.Id;
                     response.Success = updateUserTask.Result.Succeeded;
-                    response.Message = "A felhasználói profil módosítása sikeresen megtörtént.";
+                    response.Message = _serialize.GetServerLogMessage("EmployeeProfileUpdated");
                 }
 
             }
             else {
-                response.Message = "A kéréshez nem tartozik felhasználó, a módosítás sikertelen volt.";
+                response.Message = _serialize.GetServerLogMessage("EmployeeRetrievalError");
             }
 
             cancelUpdateBio:
             return JsonConvert.SerializeObject(response);
-        }
-
-        [HttpPost]
-        // Meghívó küldés regisztrációhoz.
-        public string SendInvitation(string inviteeId, string destination)
-        {
-            string response = null;
-
-            if (!Startup.SignInManager.IsSignedIn(User)) {
-                response = "Bejelentkezés szükséges.";
-                goto cancelInvitation;
-            }
-
-            var client = new SmtpClient(Startup.Email.Host, Startup.Email.Port);
-            client.EnableSsl = true;
-        
-            var company = repo.GetCompanyDetails();
-
-            // TODO:
-            //
-            //  - Invitation GUID generation (6 digits)
-            //  - Invitation expirity generation (24 hours)
-            //  - clickable link generation
-            //  - log the sender id (user id)
-            //
-            var message = new MailMessage(company.CompanyEmailAddress, destination, company.InvitationSubject, company.InvitationMessage);
-            var emailSenderTask = client.SendMailAsync(message);
-            emailSenderTask.Wait();
-
-            if (emailSenderTask.IsCompletedSuccessfully) 
-            {
-                response = "A meghívó elküldése sikeres volt.";
-                repo.AddInvitation(inviteeId);
-            }
-            else
-                response = "Nem sikerült elküldeni a meghívót.";
-
-            cancelInvitation:
-            return response;
-        }
-
-        [HttpPost]
-        // Kapcsolatfelvétel.
-        //
-        public string Contact()
-        {
-            // TODO
-
-            return null;
-        }
-
-        [HttpPost]
-        // Email küldés.
-        //
-        public string EmailSender()
-        {
-            // TODO
-
-            return null;
         }
 
         [HttpPost]
@@ -440,12 +530,12 @@ namespace backend.Controllers
             var response = new ItemPostedResultModel();
 
             if (!Startup.SignInManager.IsSignedIn(User)) {
-                response.Message = "Bejelentkezés szükséges.";
+                response.Message = _serialize.GetServerLogMessage("AuthenticationRequiredError");
                 goto cancelDelete;
             }
 
             if (employeeId == null) {
-                response.Message = "Nincs megadva azonosító.";
+                response.Message = _serialize.GetServerLogMessage("EmployeeIdIncorrectError");
                 goto cancelDelete;
             }
 
@@ -454,7 +544,7 @@ namespace backend.Controllers
             var user = new User();
 
             if (!getUserTask.IsCompletedSuccessfully || getUserTask.Result == null)
-                response.Message = "A megadott azonosítójú munkatárs nem található.";
+                response.Message = _serialize.GetServerLogMessage("EmployeeIdRetrievalError");
             else {
                 user = getUserTask.Result;
                 response.ItemId = user.Id;
@@ -464,9 +554,9 @@ namespace backend.Controllers
             deleteTask.Wait();
 
             if (!deleteTask.IsCompletedSuccessfully || !deleteTask.Result.Succeeded)
-                response.Message = "A megadott azonosítójú munkatárs törlése sikertelen volt.";
+                response.Message = _serialize.GetServerLogMessage("EmployeeDeleteError");
             else {
-                response.Message = "A felhasználó törlése sikeresen megtörtént.";
+                response.Message = _serialize.GetServerLogMessage("EmployeeDelete");
                 response.Success = deleteTask.Result.Succeeded;
             }
 

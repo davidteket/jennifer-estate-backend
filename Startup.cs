@@ -1,6 +1,4 @@
-﻿using System;
-
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -9,8 +7,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 
+using backend.Services;
 using backend.DataAccess.Entities.Identity;
-
 using backend.DataAccess;
 
 namespace backend
@@ -19,24 +17,76 @@ namespace backend
     {
         public IConfiguration Configuration { get; }
 
-        private static readonly string developerConnectionString = "Server=tcp:dunakanyarhouse-prod-db.database.windows.net,1433;Initial Catalog=dunakanyarhouse-prod-db;Persist Security Info=False;User ID=caribou;Password=R239Aq///;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
-        //private static readonly string developerConnectionString = "Server=localhost;Database=JenniferEstate;User Id=SA;Password=valami888__;";
-        private static readonly string clientSideHostDirectoryName = "frontend";
+        private static string _developerConnectionString;
+        public static string DeveloperConnectionString {
+            get {
+                return _developerConnectionString;
+            }
+        }
+
+        private static string _developerUser;
+        public static string DeveloperUser {
+            get {
+                return _developerUser;
+            }
+        }
+
+        private static string _developerPassword;
+        public static string DeveloperPassword {
+            get {
+                return _developerPassword;
+            }
+        }
+
+        private static string _developerRole;
+        public static string DeveloperRole {
+            get {
+                return _developerRole;
+            }
+        }
+
+        private string _developerFirstName;
+        public string DeveloperFirstName {
+            get {
+                return _developerFirstName;
+            }
+        }
+
+        private string _developerLastName;
+        public string DeveloperLastName {
+            get {
+                return _developerLastName;
+            }
+        }
+
+        private string _developerEmail;
+        public string DeveloperEmail {
+            get {
+                return _developerEmail;
+            }
+        }
+        
+        private Serializer _serializer;
         public static DbContextOptionsBuilder ctxOptionsBuilder => new DbContextOptionsBuilder()
-                                                                .UseSqlServer(developerConnectionString, null);
+                                                                .UseSqlServer(_developerConnectionString, null);
         public static UserManager<User> UserManager;
         public static SignInManager<User> SignInManager;
         public static RoleManager<UserRole> RoleManager;
 
-        public static class Email { 
-            public static string Host = "smtp.gmail.com";
-            public static int Port = 587;
-        }
-
-
+        // Alkalmazás konfiguráció beállítások.
+        //
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+
+            _serializer = new Serializer();
+            _developerConnectionString = _serializer.GetApplication("DeployConnectionString");
+            _developerUser = _serializer.GetApplication("User");
+            _developerPassword = _serializer.GetApplication("Password");
+            _developerRole = _serializer.GetApplication("Role");
+            _developerFirstName = _serializer.GetApplication("FirstName");
+            _developerLastName = _serializer.GetApplication("LastName");
+            _developerEmail = _serializer.GetApplication("Email");
         }
         
         public void ConfigureServices(IServiceCollection services)
@@ -48,12 +98,12 @@ namespace backend
                 
             });
 
-            // Entity Framework élesítése az alkalmazáson.
+            // Entity Framework szolgáltatás.
             //
-            services.AddDbContext<JenniferEstateContext>(options => options.UseSqlServer(developerConnectionString, null));
+            services.AddDbContext<JenniferEstateContext>(options => options.UseSqlServer(_developerConnectionString, null));
 
 
-            // Identity élesítése az alkalmazáson.
+            // Identity szolgáltatás.
             //
             var identity = services.AddIdentity<User, UserRole>()
                                    .AddEntityFrameworkStores<JenniferEstateContext>()
@@ -72,7 +122,7 @@ namespace backend
             //
             services.Configure<IdentityOptions>(options => {
 
-                    options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.";
+                    options.User.AllowedUserNameCharacters = _serializer.GetDefaults("TmpPassRegularCharPool");
                     options.User.RequireUniqueEmail = true;
                     
                     options.Password.RequireUppercase = true;
@@ -94,6 +144,54 @@ namespace backend
             });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+            var checkRootUserExsistenceTask = Startup.UserManager.FindByNameAsync(_developerUser);
+            checkRootUserExsistenceTask.Wait();
+
+            if (checkRootUserExsistenceTask.IsCompletedSuccessfully && checkRootUserExsistenceTask.Result != null) {
+                System.Console.WriteLine(_serializer.GetServerLogMessage("RootUserExists"));
+            }
+            else {
+
+                var role = new UserRole();
+                role.Name = _developerRole;
+                var createRootRoleTask = Startup.RoleManager.CreateAsync(role);
+                createRootRoleTask.Wait();
+
+                if (createRootRoleTask.IsCompletedSuccessfully)
+                    System.Console.WriteLine(_serializer.GetServerLogMessage("RootRoleCreated"));
+                else
+                    System.Console.WriteLine(_serializer.GetServerLogMessage("RootRoleError"));
+
+                var user = new User();
+                user.UserName = _developerUser;
+                user.FirstName = _developerFirstName;
+                user.LastName = _developerLastName;
+                user.Email = _developerEmail;
+                
+                var createRootUserTask = Startup.UserManager.CreateAsync(user, _developerPassword);
+                createRootUserTask.Wait();
+
+                if (createRootUserTask.IsCompletedSuccessfully && createRootUserTask.Result != null)
+                    System.Console.WriteLine(_serializer.GetServerLogMessage("RootUserCreated"));
+                else 
+                    System.Console.WriteLine(_serializer.GetServerLogMessage("RootUserError"));
+
+                var getRootUserTask = Startup.UserManager.FindByNameAsync(_developerUser);
+                getRootUserTask.Wait();
+
+                if (getRootUserTask.IsCompletedSuccessfully && getRootUserTask.Result != null)
+                {
+                    var addtoRoleTask = Startup.UserManager.AddToRoleAsync(getRootUserTask.Result, _developerRole);
+                    addtoRoleTask.Wait();
+                    if (addtoRoleTask.IsCompletedSuccessfully)
+                        System.Console.WriteLine(_serializer.GetServerLogMessage("RootUserToRootRole"));
+                    else
+                        System.Console.WriteLine(_serializer.GetServerLogMessage("RootUserToRootRoleError"));
+                }
+            }
+
+
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -110,6 +208,8 @@ namespace backend
             // Hitelesítés kényszerítése.
             //
             app.UseAuthentication();
+
+            app.UseHttpsRedirection();
 
             // URL konfigurációk.
             //

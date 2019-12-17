@@ -1,11 +1,12 @@
-<form class="container mt-4 p-4 site-overlayitem">
+<div id='search-module-container' class='mt-1 p-4'>
 
     <div class="row">
+
         <!-- Ingatlan-kategória kiválasztása. -->
-        <div class="col mb-3">
+        <div class="col-sm-4 mb-3 text-center">
             <span class="form-group">
 
-                <label class="font-weight-bold">Típus</label>
+                <label class="font-weight-bold">Típus:</label>
 
                 <select class="form-control">
                     <option>Kertesház</option>
@@ -18,11 +19,11 @@
         </div>
 
         <!-- Minimum/maximum ár. -->
-        <div class="col">
+        <div class="col-sm-3 text-center">
             <span class="form-group">
 
                 <div class="container mb-3">
-                        <label class="font-weight-bold">Értéktartomány</label>
+                        <label class="font-weight-bold">Értéktartomány:</label>
                         <div>
                             <input type="text" placeholder="-tól" class="form-control"/>
                         </div>
@@ -35,11 +36,11 @@
         </div>
 
         <!-- Város kiválasztása. -->
-        <div class="col">
+        <div class="col-sm-5  text-center">
             <span class="form-group">
 
                 <div>
-                    <label class="font-weight-bold">Település</label>
+                    <label class="font-weight-bold">Település:</label>
                     <input type="text" placeholder="pld. Siófok" class="form-control"/>
                 </div>
 
@@ -49,26 +50,24 @@
     </div>
 
     <div id="search-buttons" class="row">
-        
 
-            <!-- Keresés. -->
-        <span class="col-sm-5">
+        <!-- Mégsem. -->
+        <span class='col-sm-3 text-center'>
 
-            <button id="start-simple-search" class="btn btn-primary float-left hvr-grow mt-2" type="button">
-
-                <span class="fas fa-search"></span>
-                &nbsp;
-                Keresés&nbsp;
+            <button id='hide-simple-search-container' type='button'
+                    class='btn btn-danger mt-2 hvr-grow'>
+                    <span class='fa fa-backspace'></span>
+                    &nbsp;&nbsp;Mégsem
 
             </button>
 
         </span>
 
         <!-- Összetett keresés. -->
-        <span class="col-sm-5">
+        <span class="col-sm-3 text-center">
             
                 <button id="advanced-search" type="button"
-                        class="btn btn-dark float-left mr-3 hvr-grow mt-2">
+                        class="btn btn-dark hvr-grow mt-2">
     
                     <span class="fas fa-list"></span>
                     Részletes
@@ -76,11 +75,9 @@
             </button>
     
         </span>
-    
-    </div>
-    <div class='row'>
+
         <!-- Új ingatlan-hirdetés -->
-        <span class="col">
+        <span class="col-sm-3 text-center">
 
                 <button id="add-new-estate" class="btn btn-warning hvr-grow mt-2" data-toggle="modal"
                         data-target="#new-estate-modal" type="button">
@@ -91,7 +88,21 @@
 
                 </button>
 
+        </span>    
+
+            <!-- Keresés. -->
+        <span class="col-sm-3 text-center">
+
+            <button id="start-simple-search" class="btn btn-primary hvr-grow mt-2" type="button">
+
+                <span class="fas fa-search"></span>
+                &nbsp;
+                Keresés&nbsp;
+
+            </button>
+
         </span>
+
     </div>
 
         <div>
@@ -379,4 +390,4 @@
         
     </div>
 
-</form>
+</div>

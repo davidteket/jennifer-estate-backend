@@ -1,25 +1,58 @@
-<div id="page-footer" class="mt-3 site-overlayitem">
+<div id="page-footer" class="mt-1 site-overlayitem text-center">
 
-        <div class="container">
+        <div class='text-center'>
                 <div class="row p-2">
 
-                        <span class="small col pb-2 pt-2">
+                        <div class="small col pb-2 pt-2">
                                 <span class="fas fa-phone"></span>
-                                &nbsp;
-                                +36 30 296-5165&nbsp;|&nbsp;+36 30 296-5366
-                        </span>
+                                &nbsp;&nbsp;Tel. #1:&nbsp;&nbsp;
 
-                        <span class="small col pb-2 pt-2">
+                                <span class='font-weight-bold'>
+                                        <br/>
+                                        <br/>
+                                        +36 30/296-5165
+                                </span>
+                        </div>
+                        <div class="small col pb-2 pt-2">
+                                <span class="fas fa-phone"></span>
+                                &nbsp;&nbsp;Tel. #2:&nbsp;&nbsp;
+
+                                <span class='font-weight-bold'>
+                                        <br/>
+                                        <br/>
+                                        +36 30/296-5366
+                                </span>
+                        </div>
+                </div>
+                <div class="row p-2">
+
+                        <div class="small col pb-2 pt-2">
                                 <span class="fas fa-map-marked"></span>
                                 &nbsp;
                                 2600, Vác, Káptalan utca 7 
-                        </span>
+                        </div>
 
-                        <span class="small col pb-2 pt-2">
+                </div>
+                <div class="row p-2">
+
+                        <div class="small col pb-2 pt-2">
                                 <span class="fas fa-envelope"></span>
                                 &nbsp;
                                 info@dunakanyarhouse.hu
-                        </span>
+                        </div>
+                </div>
+                <div class='row'>
+
+                                <span   id="login-modal-popup"
+                                class="small btn btn-link col site-link-pointer pb-2 pt-2"
+                                data-toggle="modal"
+                                data-target="#login-modal">
+                                <span class="fas fa-lock"></span>
+                                &nbsp;
+                                        Bejelentkezés
+                                </span>
+                </div>
+                
 
                         <!-- Bejelentkezés ablak. -->
                         <div class="modal fade" id="login-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -55,10 +88,29 @@
                                                                 
                                                         </div>
 
+                                                        <!-- Helytelen belépési adatok. -->
                                                         <div class="alert alert-danger text-center" id="invalid-credentials-login">
                                                                 
                                                                 <br/>
                                                                 Hibás felhasználói név vagy jelszó.
+                                                                <br/>
+
+                                                        </div>
+
+                                                        <!-- Várakozás a hitelesítésre. -->
+                                                        <div class="alert alert-dark text-center" id="waiting-for-authorization">
+
+                                                                <br/>
+                                                                Kérlek várj a hitelesítésre...
+                                                                <br/>
+
+                                                        </div>
+
+                                                        <!-- Bejelentkezés sikeres. -->
+                                                        <div class="alert alert-success text-center" id="valid-credentials-login">
+
+                                                                <br/>
+                                                                Sikeres bejelentkezés! Átirányítás...
                                                                 <br/>
 
                                                         </div>
@@ -91,20 +143,9 @@
                                         </div>
                                 </div>
 
-                        </div>
-
-                        <span   id="login-modal-popup"
-                                class="small col site-link-pointer hvr-underline-from-center pb-2 pt-2"
-                                data-toggle="modal"
-                                data-target="#login-modal">
-                                <span class="fas fa-lock"></span>
-                                &nbsp;
-                                Bejelentkezés
-                        </span>
-                        
+                        </div>                        
 
                 </div>
-
         </div>
                 
 </div>

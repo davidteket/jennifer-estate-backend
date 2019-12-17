@@ -16,7 +16,7 @@ namespace backend.Controllers
 {
     public class EstateController : Controller
     {
-        private IRepository repo = new Repository();
+        private IRepository _repo = new Repository();
 
         #region WebAPI GET  
 
@@ -27,14 +27,14 @@ namespace backend.Controllers
         {
             var response = new List<EstateOverviewViewModel>();
 
-            List<Estate> estates = repo.GetEstates(from, limit);
+            List<Estate> estates = _repo.GetEstates(from, limit);
             foreach (Estate estate in estates)
             {
                 var estateOverview = new EstateOverviewViewModel();
 
-                Advertisement ad = repo.GetAdvertisement(estate.Id);
-                Address address = repo.GetAddress(estate.Id);
-                GenericImage thumbnail = repo.GetEstateThumbnail(estate.Id);
+                Advertisement ad = _repo.GetAdvertisement(estate.Id);
+                Address address = _repo.GetAddress(estate.Id);
+                GenericImage thumbnail = _repo.GetEstateThumbnail(estate.Id);
 
                 if (ad == null || address == null)
                     continue;
@@ -42,7 +42,7 @@ namespace backend.Controllers
                 if (thumbnail == null) 
                 {
                     thumbnail = new GenericImage();
-                    thumbnail.Id = "no-image";
+                    thumbnail.Id = "default/no-image";
                     thumbnail.Extension = ".jpg";
                 }
 
@@ -70,14 +70,14 @@ namespace backend.Controllers
         {
             var response = new EstateDetailsViewModel();
 
-            Estate estate = repo.GetEstate(estateId);
-            Electricity electricity = repo.GetElectricity(estateId);
-            HeatingSystem heating = repo.GetHeatingSystem(estateId);
-            Address address = repo.GetAddress(estateId);
-            WaterSystem water = repo.GetWaterSystem(estateId);
-            PublicService services = repo.GetPublicService(estateId);
-            Advertisement advertisement = repo.GetAdvertisement(estateId);
-            List<GenericImage> images = repo.GetEstateImages(estateId);
+            Estate estate = _repo.GetEstate(estateId);
+            Electricity electricity = _repo.GetElectricity(estateId);
+            HeatingSystem heating = _repo.GetHeatingSystem(estateId);
+            Address address = _repo.GetAddress(estateId);
+            WaterSystem water = _repo.GetWaterSystem(estateId);
+            PublicService services = _repo.GetPublicService(estateId);
+            Advertisement advertisement = _repo.GetAdvertisement(estateId);
+            List<GenericImage> images = _repo.GetEstateImages(estateId);
 
             response.Estate = estate;
             response.Electricity = electricity;
@@ -97,7 +97,7 @@ namespace backend.Controllers
         public string HeatingDetail(int estateId)
         {
             var response = new HeatingSystemViewModel();
-            HeatingSystem heating = repo.GetHeatingSystem(estateId);
+            HeatingSystem heating = _repo.GetHeatingSystem(estateId);
 
             response.ByWood = heating.ByWood;
             response.ByRemote = heating.ByRemote;
@@ -114,7 +114,7 @@ namespace backend.Controllers
         public string ElectricityDetail(int estateId)
         {
             var response = new ElectricityViewModel();
-            Electricity electricity = repo.GetElectricity(estateId);
+            Electricity electricity = _repo.GetElectricity(estateId);
 
             response.SunCollector = electricity.SunCollector;
             response.Thermal = electricity.Thermal;
@@ -129,7 +129,7 @@ namespace backend.Controllers
         public string PublicServiceDetail(int estateId)
         {
             var response = new PublicServiceViewModel();
-            PublicService publicService = repo.GetPublicService(estateId);
+            PublicService publicService = _repo.GetPublicService(estateId);
 
             response.Grocery = publicService.Grocery;
             response.GasStation = publicService.GasStation;
@@ -148,7 +148,7 @@ namespace backend.Controllers
         public string RandomShowCase()
         {
             List<string> response = null;
-            response = repo.GetRandomImages(3);
+            response = _repo.GetRandomImages(3);
 
             return JsonConvert.SerializeObject(response);
         }
@@ -187,16 +187,16 @@ namespace backend.Controllers
             {
                 var wrapper = (UploadWrapperModel) toAdd;
 
-                int estateId = repo.AddEstate(wrapper.Estate);
+                int estateId = _repo.AddEstate(wrapper.Estate);
 
                 if (estateId != 0)
                 {
-                    repo.AddAddress(wrapper.Address, estateId);
-                    repo.AddElectricity(wrapper.Electricity, estateId);
-                    repo.AddHeatingSystem(wrapper.Heating, estateId);
-                    repo.AddPublicService(wrapper.PublicService, estateId);
-                    repo.AddWaterSystem(wrapper.Water, estateId);
-                    repo.AddAdvertisement(wrapper.Advertisement, estateId, wrapper.Estate.AdvertiserId);
+                    _repo.AddAddress(wrapper.Address, estateId);
+                    _repo.AddElectricity(wrapper.Electricity, estateId);
+                    _repo.AddHeatingSystem(wrapper.Heating, estateId);
+                    _repo.AddPublicService(wrapper.PublicService, estateId);
+                    _repo.AddWaterSystem(wrapper.Water, estateId);
+                    _repo.AddAdvertisement(wrapper.Advertisement, estateId, wrapper.Estate.AdvertiserId);
                 }
 
                 response.ItemId = estateId.ToString();
@@ -241,13 +241,13 @@ namespace backend.Controllers
                 data = System.Text.Encoding.Default.GetString(buffer);
                 model = (UploadWrapperModel) JsonConvert.DeserializeObject(data, typeof(UploadWrapperModel));
 
-                repo.UpdateEstate(model.Estate);
-                repo.UpdateAddress(model.Address);
-                repo.UpdateElectricity(model.Electricity);
-                repo.UpdateHeatingSystem(model.Heating);
-                repo.UpdatePublicService(model.PublicService);
-                repo.UpdateWaterSystem(model.Water);
-                repo.UpdateAdvertisement(model.Advertisement);
+                _repo.UpdateEstate(model.Estate);
+                _repo.UpdateAddress(model.Address);
+                _repo.UpdateElectricity(model.Electricity);
+                _repo.UpdateHeatingSystem(model.Heating);
+                _repo.UpdatePublicService(model.PublicService);
+                _repo.UpdateWaterSystem(model.Water);
+                _repo.UpdateAdvertisement(model.Advertisement);
 
                 response.Message = "A hirdetés sikeresen módosítva lett.";
                 response.Success = true;
@@ -273,7 +273,7 @@ namespace backend.Controllers
                 goto cancelDelete;
             }
 
-            response.Success = repo.DeleteEstate(estateId);
+            response.Success = _repo.DeleteEstate(estateId);
             response.ItemId = estateId.ToString(); 
 
             cancelDelete:
@@ -321,7 +321,7 @@ namespace backend.Controllers
                             imageData.DescriptionDetail = imageData.DescriptionDetail;
                             imageData.Extension = extension;
 
-                            bool storeSuccess = repo.AddImage(imageData);
+                            bool storeSuccess = _repo.AddImage(imageData);
 
                             if (storeSuccess) {
                                 response.ItemId = imageData.Id;
