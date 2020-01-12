@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 
-namespace backend.DataAccess.Entities.Identity
+namespace DunakanyarHouseIngatlan.DataAccess.Entities.Identity
 {
     public class Role : IdentityRole {}
 }

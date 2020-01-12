@@ -1,58 +1,32 @@
-using backend.Services;
-using backend.DataAccess.Entities.Identity;
-using backend.DataAccess;
-using backend.Models;
+using DunakanyarHouseIngatlan.Services;
+using DunakanyarHouseIngatlan.DataAccess.Entities.Identity;
+using DunakanyarHouseIngatlan.DataAccess;
+using DunakanyarHouseIngatlan.Models;
 
 using Microsoft.AspNetCore.Mvc;
 
 using Newtonsoft.Json;
+using PasswordGenerator;
 
 using System.Collections.Generic;
 using System.Linq;
 
-namespace backend.Controllers
+namespace DunakanyarHouseIngatlan.Controllers
 {
     public class EmployeeController : Controller
     {
         private IRepository _repo = new Repository();
-        private Serializer _serialize = new Serializer();
+        private Serializer _serializer = new Serializer();
         private Email _email = new Email();
 
-        #region Utility
-
-        // Ideiglenes jelszó generálás.
-        //
-        private string GeneratePassword()
+        public EmployeeController(IRepository implementation)
         {
-            string result = null;
-
-            int minLength = 8;
-            int maxLength = 16;
-            string pool = _serialize.GetDefaults("TmpPassRegularCharPool");
-            string spec = _serialize.GetDefaults("TmpPassSpecialCharPool");
-
-            var rnd = new System.Random();
-            int length = rnd.Next(minLength, maxLength);
-
-            for (int i = 0; i < length; ++i) {
-                int j = rnd.Next(0, pool.Length - 1);
-                int k = rnd.Next(0, 1);
-                int l = rnd.Next(0, 1);
-                int m = rnd.Next(0, 1);
-
-                bool isUpper = k == 1 ? true : false;
-                bool addNumber = l == 1 ? true : false;
-                int s = rnd.Next(0, spec.Length - 1);
-
-                string chunk = isUpper ? pool[j].ToString().ToUpper() : pool[j].ToString();
-                chunk += addNumber ? i.ToString() : "0";
-                chunk += spec[s].ToString();
-
-                result += chunk;
-            }
-
-            return result;
+            _serializer = new Serializer();
+            _email = new Email();
+            _repo = implementation;
         }
+
+        #region Util
 
         // Felhasználói név generálás.
         //
@@ -91,19 +65,19 @@ namespace backend.Controllers
 
         #endregion
 
-        #region WebAPI GET
+        #region api/GET
 
 
-        [HttpGet]
         // Munkatársak.
         //
+        [HttpGet]
         public string Employees()
         {
             string response = null;
 
             IList<EmployeeOverviewViewModel> overviews = new List<EmployeeOverviewViewModel>();
-
             IList<User> users = new List<User>();
+
             var getUsersTask = Startup.UserManager.GetUsersInRoleAsync("employee");
             getUsersTask.Wait();
 
@@ -115,9 +89,7 @@ namespace backend.Controllers
                     var overview = new EmployeeOverviewViewModel();
                 
                     overview.EmployeeId = user.Id;
-                    overview.ApproachType = user.ApproachType;
                     overview.FirstName = user.FirstName;
-                    overview.MiddleName = user.MiddleName;
                     overview.LastName = user.LastName;
                     overview.ProfilePictureId = "TODO";
 
@@ -126,49 +98,44 @@ namespace backend.Controllers
 
                 response = JsonConvert.SerializeObject(overviews);
             }
-            else{
-                response = _serialize.GetServerLogMessage("EmployeeRetrievalError");
-                // LOG - red
-            }
+            else
+                response = _serializer.GetServerLogMessage("EmployeeRetrievalError");
 
             return response;
         }
 
-        [HttpGet] 
         // Munkatárs-profil részletek.
         //
+        [HttpGet] 
         public string Details(string employeeId)
         {
             string response = null;
 
-            var details = new EmployeeDetailsViewModel();
-            if (employeeId == null) {
-                response = _serialize.GetServerLogMessage("EmployeeIdIncorrectError");
-                goto cancelBio;
-            }
-            else {
+            if (employeeId == null)
+                response = _serializer.GetServerLogMessage("EmployeeIdIncorrectError");
+            else 
+            {
                 var getUserTask = Startup.UserManager.FindByIdAsync(employeeId);
                 getUserTask.Wait();
 
                 if (getUserTask.IsCompletedSuccessfully && getUserTask.Result != null) 
                 {
-                    var user = new User();
-                    user = getUserTask.Result;
+                    var user = getUserTask.Result;
+                    var details = new EmployeeDetailsViewModel();
 
                     details.EmployeeId = user.Id;
-                    details.ApproachType = user.ApproachType;
                     details.FirstName = user.FirstName;
-                    details.MiddleName = user.MiddleName;
                     details.LastName = user.LastName;
                     details.UserName = user.UserName;
                     details.Phone = user.PhoneNumber;
                     details.Email = user.Email;
                     details.Description = user.Description;
                     details.AdvertisementCount = _repo.GetAdvertisements().Where(a => a.AdvertiserId == user.Id).Count();
+
                     var image = _repo.GetProfilePictureId(user.Id);
-                    if (image == null) {
-                        details.ProfilePictureId = _serialize.GetDefaults("Picture");
-                    }
+
+                    if (image == null)
+                        details.ProfilePictureId = _serializer.GetDefaults("Picture");
                     else
                         details.ProfilePictureId = image.Id + image.Extension;
 
@@ -176,24 +143,20 @@ namespace backend.Controllers
                     getUserRoleTask.Wait();
 
                     if (getUserRoleTask.IsCompletedSuccessfully && getUserRoleTask.Result != null)
-                        details.EmployeeRoles = getUserRoleTask.Result.ToList();
-                    
+                        details.EmployeeRoles = getUserRoleTask.Result.ToList();                    
 
                     response = JsonConvert.SerializeObject(details);
                 }
-                else {
-                    response = _serialize.GetServerLogMessage("EmployeeRetrievalError");
-                    // LOG - red
-                }
+                else
+                    response = _serializer.GetServerLogMessage("EmployeeRetrievalError");
             }
 
-            cancelBio:
             return response;
         }
 
-        [HttpGet]
         // Munkatárs azonosító.
         //
+        [HttpGet]
         public string GetCurrentUserId()
         {
             var response = new ItemPostedResultModel();
@@ -201,25 +164,21 @@ namespace backend.Controllers
             var getUserTask = Startup.UserManager.GetUserAsync(User);
             getUserTask.Wait();
 
-            if (getUserTask.IsCompletedSuccessfully && getUserTask.Result != null) {
+            if (getUserTask.IsCompletedSuccessfully && getUserTask.Result != null) 
+            {
                 response.ItemId = getUserTask.Result.Id;
-                response.Message = _serialize.GetServerLogMessage("EmployeeIdRetrieved");
+                response.Message = _serializer.GetServerLogMessage("EmployeeIdRetrieved");
                 response.Success = true;
-
-                // LOG - green
             }
-            else {
-                response.Message = _serialize.GetServerLogMessage("EmployeeRetrievalError");
-
-                // LOG - red
-            }
+            else
+                response.Message = _serializer.GetServerLogMessage("EmployeeRetrievalError");
 
             return JsonConvert.SerializeObject(response);
         }
 
-        [HttpGet]
         // Jogosultságok.
         //
+        [HttpGet]
         public string GetRoles()
         {
             var response = new List<string>();
@@ -232,21 +191,21 @@ namespace backend.Controllers
 
         #endregion
 
-        #region WebAPI POST
+        #region api/POST
 
-        [HttpPost]
         // Új jogosultság.
         //
+        [HttpPost]
         public string NewRole(string roleTitle)
         {
             var response = new ItemPostedResultModel();
 
             bool allowed = false;
-            if (!Startup.SignInManager.IsSignedIn(User)) {
-                response.Message = _serialize.GetServerLogMessage("AuthenticationRequiredError");
-                goto cancelNewRole;
-            }
-            else {
+
+            if (!Startup.SignInManager.IsSignedIn(User))
+                response.Message = _serializer.GetServerLogMessage("AuthenticationRequiredError");
+            else 
+            {
                 string username = this.User.Identity.Name;
                 var getUserTask = Startup.UserManager.FindByNameAsync(username);
                 getUserTask.Wait();
@@ -262,17 +221,12 @@ namespace backend.Controllers
                 }
             }
 
-            if (allowed == false) {
-                response.Message = _serialize.GetServerLogMessage("RootRoleRequiredError");
-                goto cancelNewRole;
-            }
+            if (allowed == false)
+                response.Message = _serializer.GetServerLogMessage("RootRoleRequiredError");
 
             var role = new UserRole();
-
-            if (roleTitle == null) {
-                response.Message = _serialize.GetServerLogMessage("RoleTitleUnavailableError");
-                goto cancelNewRole;
-            }
+            if (roleTitle == null)
+                response.Message = _serializer.GetServerLogMessage("RoleTitleUnavailableError");
             else 
                 role.Name = roleTitle;
             
@@ -281,30 +235,29 @@ namespace backend.Controllers
 
             if (addRoleTask.IsCompletedSuccessfully && addRoleTask.Result.Succeeded)
             {
-                response.Message = _serialize.GetServerLogMessage("RoleTitleCreated");
+                response.Message = _serializer.GetServerLogMessage("RoleTitleCreated");
                 response.Success = addRoleTask.Result.Succeeded;
                 response.ItemId = role.Name;
             }
             else 
-                response.Message = _serialize.GetServerLogMessage("RoleTitleError");
+                response.Message = _serializer.GetServerLogMessage("RoleTitleError");
 
-            cancelNewRole:
             return JsonConvert.SerializeObject(response);
         }
 
-        [HttpPost]
         // Munkatárs regisztrálás.
         //
+        [HttpPost]
         public string Registration()
         {
             var response = new ItemPostedResultModel();
 
             bool allowed = false;
-            if (!Startup.SignInManager.IsSignedIn(User)) {
-                response.Message = _serialize.GetServerLogMessage("AuthenticationRequiredError");
-                goto cancelRegistration;
-            }
-            else {
+
+            if (!Startup.SignInManager.IsSignedIn(User))
+                response.Message = _serializer.GetServerLogMessage("AuthenticationRequiredError");
+            else 
+            {
                 string username = this.User.Identity.Name;
                 var getUserTask = Startup.UserManager.FindByNameAsync(username);
                 getUserTask.Wait();
@@ -320,34 +273,23 @@ namespace backend.Controllers
                 }
             }
 
-            if (allowed == false) {
-                response.Message = _serialize.GetServerLogMessage("RootRoleToUserRequiredError");
-                goto cancelRegistration;
-            }
+            if (allowed == false)
+                response.Message = _serializer.GetServerLogMessage("RootRoleToUserRequiredError");
             
             var user = new DataAccess.Entities.Identity.User();
-
-            int length = (int) HttpContext.Request.ContentLength;
-            byte[] buffer = new byte[length];
-            var bufferTask = HttpContext.Request.Body.ReadAsync(buffer, 0, length);
-            bufferTask.Wait();
-            string data = null;
-
             RegistrationViewModel registration = null;
+            string data = _serializer.GetRequestContent(this.HttpContext);
 
-            if (bufferTask.IsCompletedSuccessfully)
-            {
-                data = System.Text.Encoding.Default.GetString(buffer);
+            if (data != null)                
                 registration = (RegistrationViewModel) JsonConvert.DeserializeObject(data, typeof(RegistrationViewModel));
-            }
 
-            string tempPassword = GeneratePassword();
+            var passGenerator = new Password();
+            string tempPassword = passGenerator.Next();;
             string userName = GenerateUserName(registration.FirstName, registration.LastName);
 
             user.Description = registration.Description;
             user.Email = registration.Email;
             user.FirstName = registration.FirstName;
-            user.MiddleName = registration.MiddleName;
             user.LastName = registration.LastName;
             user.PhoneNumber = registration.Phone;
             user.UserName = userName;
@@ -357,7 +299,7 @@ namespace backend.Controllers
 
             if (!createUserTask.IsCompletedSuccessfully || !createUserTask.Result.Succeeded) {
                 response = new ItemPostedResultModel();
-                response.Message = _serialize.GetServerLogMessage("EmployeeError");
+                response.Message = _serializer.GetServerLogMessage("EmployeeError");
             }
             else 
             {
@@ -368,48 +310,41 @@ namespace backend.Controllers
                 {
                     User newUser = getUserTask.Result;
                     response.ItemId = newUser.Id;
-                    response.Message = _serialize.GetServerLogMessage("EmployeeCreated");
+                    response.Message = _serializer.GetServerLogMessage("EmployeeCreated");
 
                     var addToRoleTask = Startup.UserManager.AddToRoleAsync(newUser, registration.RoleTitle);
                     addToRoleTask.Wait();
 
-                    if (addToRoleTask.IsCompletedSuccessfully && addToRoleTask.Result != null) {
-                        response.Message += _serialize.GetServerLogMessage("EmployeeReceivedRole").Replace("{0}", registration.RoleTitle);
-                        response.Success = _email.NotifyRegistration(user.Email, string.Concat(user.LastName, " ", user.FirstName), user.UserName, tempPassword, registration.RoleTitle);
-                        response.Message += response.Success ? _serialize.GetServerLogMessage("EmailNotification") : _serialize.GetServerLogMessage("EmailNotificationError");
+                    if (addToRoleTask.IsCompletedSuccessfully && addToRoleTask.Result != null) 
+                    {
+                        bool emailSent = _email.NotifyRegistration(user.Email, string.Concat(user.LastName, " ", user.FirstName), user.UserName, tempPassword, registration.RoleTitle);
+
+                        response.Message += _serializer.GetServerLogMessage("EmployeeReceivedRole").Replace("{0}", registration.RoleTitle);
+                        response.Message += response.Success ? _serializer.GetServerLogMessage("EmailNotification") : _serializer.GetServerLogMessage("EmailNotificationError");
+                        response.Success = true;
                     }
                     else {
-                        response.Message += _serialize.GetServerLogMessage("EmployeeRoleError");
+                        response.Message += _serializer.GetServerLogMessage("EmployeeRoleError");
                         response.Success = false;
                     }
                 }
             }
 
-            cancelRegistration:
             return JsonConvert.SerializeObject(response);
         }
 
-        [HttpPost]
         // Munkatárs beléptetés.
         //
+        [HttpPost]
         public string Login()
         {
             var response = new ItemPostedResultModel();
 
             var credentials = new Login();
+            string data = _serializer.GetRequestContent(this.HttpContext);
 
-            int length = (int) HttpContext.Request.ContentLength;
-            byte[] buffer = new byte[length];
-            var bufferTask = HttpContext.Request.Body.ReadAsync(buffer, 0, length);
-            bufferTask.Wait();
-
-            string data = null;
-
-            if (bufferTask.IsCompletedSuccessfully)
-            {
-                data = System.Text.Encoding.Default.GetString(buffer);
+            if (data != null)
                 credentials = (Login) JsonConvert.DeserializeObject(data, typeof(Login));
-            }
 
             var getUserTask = Startup.UserManager.FindByNameAsync(credentials.UserName);
             getUserTask.Wait();
@@ -425,17 +360,18 @@ namespace backend.Controllers
                     var signInTask = Startup.SignInManager.PasswordSignInAsync(user, credentials.Password, false, false);
                     signInTask.Wait();
 
-                    if (signInTask.IsCompletedSuccessfully) {
+                    if (signInTask.IsCompletedSuccessfully)
+                    {
                         response.ItemId = user.Id;
                         response.Success = true;
-                        response.Message = _serialize.GetServerLogMessage("Authentication");
+                        response.Message = _serializer.GetServerLogMessage("Authentication");
                     }
                 }
                 else 
-                    response.Message = _serialize.GetServerLogMessage("AuthenticationPasswordError");
+                    response.Message = _serializer.GetServerLogMessage("AuthenticationPasswordError");
             }
             else
-                response.Message = _serialize.GetServerLogMessage("AuthenticationUserError");
+                response.Message = _serializer.GetServerLogMessage("AuthenticationUserError");
 
             return JsonConvert.SerializeObject(response);
         }
@@ -447,78 +383,62 @@ namespace backend.Controllers
         {
             var response = new ItemPostedResultModel();
 
-            if (!Startup.SignInManager.IsSignedIn(User)) {
-                response.Message = _serialize.GetServerLogMessage("AuthenticationRequiredError");
-                goto cancelLogout;
-            }
+            if (!Startup.SignInManager.IsSignedIn(User))
+                response.Message = _serializer.GetServerLogMessage("AuthenticationRequiredError");
 
             var signOutTask = Startup.SignInManager.SignOutAsync();
             signOutTask.Wait();
 
             if (signOutTask.IsCompletedSuccessfully)
-                response.Message = _serialize.GetServerLogMessage("AuthenticationLoggedOut");
+                response.Message = _serializer.GetServerLogMessage("AuthenticationLoggedOut");
             else
-                response.Message = _serialize.GetServerLogMessage("AuthenticationLoggedOutError");
-
-            cancelLogout: 
+                response.Message = _serializer.GetServerLogMessage("AuthenticationLoggedOutError");
+                
             return JsonConvert.SerializeObject(response);
         }
 
-        [HttpPost]
         // Munkatárs-profil módosítás.
         //
+        [HttpPost]
         public string UpdateProfile()
         {
             var response = new ItemPostedResultModel();
 
-            if (!Startup.SignInManager.IsSignedIn(User)) {
-                response.Message = _serialize.GetServerLogMessage("AuthenticationRequiredError");
-                goto cancelUpdateBio;
-            }
+            if (!Startup.SignInManager.IsSignedIn(User))
+                response.Message = _serializer.GetServerLogMessage("AuthenticationRequiredError");
 
-            var bio = new Bio();
+            var bio = new EmployeeDetailsViewModel();
+            string data = _serializer.GetRequestContent(this.HttpContext);
 
-            int length = (int) HttpContext.Request.ContentLength;
-            byte[] buffer = new byte[length];
-            var bufferTask = HttpContext.Request.Body.ReadAsync(buffer, 0, length);
-            bufferTask.Wait();
-
-            if (bufferTask.IsCompletedSuccessfully)
-            {
-                string data = System.Text.Encoding.Default.GetString(buffer);
-                bio = (Bio) JsonConvert.DeserializeObject(data, typeof(Bio));
-            }
+            if (data != null)
+                bio = (EmployeeDetailsViewModel) JsonConvert.DeserializeObject(data, typeof(EmployeeDetailsViewModel));
 
             var getUserTask = Startup.UserManager.GetUserAsync(this.User);
             getUserTask.Wait();
-
 
             if (getUserTask.IsCompletedSuccessfully && getUserTask.Result != null)
             {
                 User user = getUserTask.Result;
 
                 user.FirstName = bio.FirstName;
-                user.MiddleName = bio.MiddleName;
                 user.LastName = bio.LastName;
-                user.ApproachType = bio.ApproachType;
                 user.Description = bio.Description;
                 user.PhoneNumber = user.PhoneNumber;
 
                 var updateUserTask = Startup.UserManager.UpdateAsync(user);
                 updateUserTask.Wait();
 
-                if (updateUserTask.IsCompletedSuccessfully && updateUserTask.Result.Succeeded) {
+                if (updateUserTask.IsCompletedSuccessfully && updateUserTask.Result.Succeeded) 
+                {
                     response.ItemId = user.Id;
                     response.Success = updateUserTask.Result.Succeeded;
-                    response.Message = _serialize.GetServerLogMessage("EmployeeProfileUpdated");
+                    response.Message = _serializer.GetServerLogMessage("EmployeeProfileUpdated");
                 }
 
             }
-            else {
-                response.Message = _serialize.GetServerLogMessage("EmployeeRetrievalError");
-            }
-
-            cancelUpdateBio:
+            else
+                response.Message = _serializer.GetServerLogMessage("EmployeeRetrievalError");
+                
             return JsonConvert.SerializeObject(response);
         }
 
@@ -529,23 +449,20 @@ namespace backend.Controllers
         {
             var response = new ItemPostedResultModel();
 
-            if (!Startup.SignInManager.IsSignedIn(User)) {
-                response.Message = _serialize.GetServerLogMessage("AuthenticationRequiredError");
-                goto cancelDelete;
-            }
+            if (!Startup.SignInManager.IsSignedIn(User))
+                response.Message = _serializer.GetServerLogMessage("AuthenticationRequiredError");
 
-            if (employeeId == null) {
-                response.Message = _serialize.GetServerLogMessage("EmployeeIdIncorrectError");
-                goto cancelDelete;
-            }
+            if (employeeId == null)
+                response.Message = _serializer.GetServerLogMessage("EmployeeIdIncorrectError");
 
             var getUserTask = Startup.UserManager.FindByIdAsync(employeeId);
             getUserTask.Wait();
             var user = new User();
 
             if (!getUserTask.IsCompletedSuccessfully || getUserTask.Result == null)
-                response.Message = _serialize.GetServerLogMessage("EmployeeIdRetrievalError");
-            else {
+                response.Message = _serializer.GetServerLogMessage("EmployeeIdRetrievalError");
+            else 
+            {
                 user = getUserTask.Result;
                 response.ItemId = user.Id;
             }
@@ -554,13 +471,13 @@ namespace backend.Controllers
             deleteTask.Wait();
 
             if (!deleteTask.IsCompletedSuccessfully || !deleteTask.Result.Succeeded)
-                response.Message = _serialize.GetServerLogMessage("EmployeeDeleteError");
-            else {
-                response.Message = _serialize.GetServerLogMessage("EmployeeDelete");
-                response.Success = deleteTask.Result.Succeeded;
+                response.Message = _serializer.GetServerLogMessage("EmployeeDeleteError");
+            else 
+            {
+                response.Message = _serializer.GetServerLogMessage("EmployeeDelete");
+                response.Success = true;
             }
 
-            cancelDelete:
             return JsonConvert.SerializeObject(response);
         }
 

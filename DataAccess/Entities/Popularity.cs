@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace backend.DataAccess.Entities
+namespace DunakanyarHouseIngatlan.DataAccess.Entities
 {
     public class Popularity
     {
@@ -10,6 +10,6 @@ namespace backend.DataAccess.Entities
         public int WeekSpan { get; set; }
         public int MonthSpan { get; set; }
         public int AllTime { get; set; }
-        public int AdvertisementId { get;  set; }
+        public int EstateId { get;  set; }
     }
 }

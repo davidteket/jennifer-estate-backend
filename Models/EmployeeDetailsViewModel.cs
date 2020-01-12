@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace backend.Models
+namespace DunakanyarHouseIngatlan.Models
 {
     public class EmployeeDetailsViewModel
     {

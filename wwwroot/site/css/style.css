@@ -54,27 +54,28 @@ body {
   border-radius: 3em;
   color: #fff;
   text-decoration: none;
-  -webkit-transition: color 0.2s;
 }
 
 
 .tag:hover {
-  background-color: crimson;
+  background-color: #FE0000;
   color: white;
 }
 
 .tag-clicked {
-  background-color: crimson;
+  background-color: #FE0000 !important;
   color: white;
+  border-radius: 3em;
+  text-decoration: none;
 }
 
 .tag:hover::after {
-   border-left-color: crimson; 
+   border-left-color: #FE0000; 
 }
 
 ::selection {
   color: white;
-  background-color: crimson;
+  background-color: #FE0000;
 }
 
 .inputfile {
@@ -87,12 +88,12 @@ body {
 }
 
 .site-dropactive-zone {
-  background-color: crimson !important;
+  background-color: #FE0000 !important;
   color: #fff !important;
 }
 
 #image-upload-dropzone:hover {
-  background-color: crimson !important;
+  background-color: #FE0000 !important;
   color: #fff !important;
 }
 

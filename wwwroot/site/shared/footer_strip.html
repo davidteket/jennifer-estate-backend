@@ -1,57 +1,75 @@
-<div id="page-footer" class="mt-1 site-overlayitem text-center">
+<div id="page-footer" class="container mt-1 site-overlayitem text-center">
 
-        <div class='text-center'>
-                <div class="row p-2">
+        <div class='row'>
+                <div class='col'>
 
-                        <div class="small col pb-2 pt-2">
-                                <span class="fas fa-phone"></span>
-                                &nbsp;&nbsp;Tel. #1:&nbsp;&nbsp;
-
-                                <span class='font-weight-bold'>
-                                        <br/>
+                                <div class="pb-2 pt-2">
+                                        <span class="fas fa-phone"></span> 
                                         <br/>
                                         +36 30/296-5165
-                                </span>
-                        </div>
-                        <div class="small col pb-2 pt-2">
-                                <span class="fas fa-phone"></span>
-                                &nbsp;&nbsp;Tel. #2:&nbsp;&nbsp;
-
-                                <span class='font-weight-bold'>
-                                        <br/>
+                                </div>
+                </div>
+                <div class='col'>
+                                <div class="pb-2 pt-2">
+                                        <span class="fas fa-phone"></span>
                                         <br/>
                                         +36 30/296-5366
-                                </span>
+                                </div>
+                </div>
+        </div>
+        <div class='row'>
+
+                <div class='col'>
+                        <div class="p-2">
+
+                                <div class="pb-2 pt-2">
+                                        <span class="fas fa-map-marked"></span>
+                                        <br/>
+                                        2600, Vác, Káptalan u. 7 
+                                </div>
+
                         </div>
                 </div>
-                <div class="row p-2">
 
-                        <div class="small col pb-2 pt-2">
-                                <span class="fas fa-map-marked"></span>
-                                &nbsp;
-                                2600, Vác, Káptalan utca 7 
-                        </div>
-
+                <div class='col'>
+                                <div class="p-2">
+                
+                                        <div class="pb-2 pt-2">
+                                                <span class="fas fa-envelope"></span>
+                                                <br/>
+                                                info@dunakanyarhouse.hu
+                                        </div>
+                                </div>
                 </div>
-                <div class="row p-2">
+        </div>
+        
 
-                        <div class="small col pb-2 pt-2">
-                                <span class="fas fa-envelope"></span>
-                                &nbsp;
-                                info@dunakanyarhouse.hu
-                        </div>
-                </div>
-                <div class='row'>
+        <div class="row">
+                <div class='col'>
 
-                                <span   id="login-modal-popup"
-                                class="small btn btn-link col site-link-pointer pb-2 pt-2"
-                                data-toggle="modal"
-                                data-target="#login-modal">
-                                <span class="fas fa-lock"></span>
-                                &nbsp;
-                                        Bejelentkezés
-                                </span>
+                        <span   id="login-modal-popup"
+                        class="small btn btn-link col site-link-pointer pb-2 pt-2"
+                        data-toggle="modal"
+                        data-target="#login-modal">
+                        <span class="fas fa-lock"></span>
+                        &nbsp;
+                                Bejelentkezés
+                        </span>
                 </div>
+        </div>
+
+        <div class="row">
+                <span class="col mt-5">
+                                <button id="dev-info-btn"
+                                        type="button" 
+                                        class="btn btn-sm btn-link col site-link-pointer">
+                                        <span class="fa fa-code"></span>
+                                        &nbsp;
+                                        Impresszum
+                                </button>
+                </span>
+        </div>
+        
                 
 
                         <!-- Bejelentkezés ablak. -->
@@ -63,7 +81,9 @@
                                                 <div class="modal-header">
 
                                                         <h5 class="modal-title" id="exampleModalLabel">
-                                                                Munkatárs Beléptető Felület
+                                                                <span class="fa fa-sign-in-alt"></span>
+                                                                &nbsp;&nbsp;
+                                                                Bejelentkezés...
                                                         </h5>
 
                                                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -77,8 +97,8 @@
                                                         <div class="form-group">
 
                                                                 <div class="mt-4">
-                                                                        <label for="username">Felhasználói Név:&nbsp;</label>
-                                                                        <input type="text" id="username" placeholder="valaki@teszt.hu" class="form-control"/>
+                                                                        <label for="username">Felhasználó:&nbsp;</label>
+                                                                        <input type="text" id="username" placeholder="valaki@dunakanyarhouseingatlan.hu" class="form-control"/>
                                                                 </div>
 
                                                                 <div class="mt-4">
@@ -128,13 +148,13 @@
                                                                                 <button id="login-btn"
                                                                                         type="button" 
                                                                                         class="btn btn-primary hvr-grow">
-                                                                                        <span class="fa fa-sign-in-alt"></span>
+                                                                                        <span class="fa fa-chevron-right"></span>
                                                                                         &nbsp;
-                                                                                        Bejelentkezés
+                                                                                        Hitelesítés
                                                                                 </button>
                                                                         </span>
 
-                                                                        <span class="col">&nbsp;</span>
+                                                                        
                                                                 </div>
                                                         </div>
 

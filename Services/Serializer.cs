@@ -1,11 +1,11 @@
-using Json.Net;
+using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
 
 using System;
 using System.IO;
 using System.Text;
 
-namespace backend.Services
+namespace DunakanyarHouseIngatlan.Services
 {
     public class Serializer 
     {
@@ -15,18 +15,26 @@ namespace backend.Services
         public Serializer()
         {
             _resourcePath = Path.Combine(Directory.GetCurrentDirectory(), "appconfig.json");
-            FileStream stream = File.OpenRead(_resourcePath);
-            int length = (int) stream.Length;
+            FileStream stream = null;
 
-            byte[] buffer = new byte[length];
-            var getResourceTask = stream.ReadAsync(buffer, 0, length);
-            getResourceTask.Wait();
+            try {
 
-            if (getResourceTask.IsCompletedSuccessfully)
-                _resourceContent = Encoding.Default.GetString(buffer);
-            else {
-                Console.WriteLine("Nem sikerült elindítani az alkalmazást. Kérlek lépj kapcsolatba a fejlesztővel.");
-                Environment.Exit(-1);
+                stream = File.OpenRead(_resourcePath);
+                int length = (int) stream.Length;
+
+                byte[] buffer = new byte[length];
+                var getResourceTask = stream.ReadAsync(buffer, 0, length);
+                getResourceTask.Wait();
+
+                if (getResourceTask.IsCompletedSuccessfully)
+                    _resourceContent = Encoding.Default.GetString(buffer);
+                else {
+                    Console.WriteLine("Nem sikerült elindítani az alkalmazást. Kérlek lépj kapcsolatba a fejlesztővel.");
+                    Environment.Exit(-1);
+                }
+
+            } catch (FileNotFoundException notfound) {
+                Console.WriteLine("Nem található a konfigurációs fájl.");
             }
         }
 
@@ -91,6 +99,23 @@ namespace backend.Services
 
             JObject jsonObject = JObject.Parse(_resourceContent);
             result = (string) jsonObject["Application"][key];
+
+            return result;
+        }
+
+        // Http kéréssel kapcsolatos tartalom lekérése.
+        //
+        public string GetRequestContent(HttpContext httpContext)
+        {
+            string result = null;
+
+            int length = (int) httpContext.Request.ContentLength;
+            byte[] buffer = new byte[length];
+            var bufferTask = httpContext.Request.Body.ReadAsync(buffer, 0, length);
+            bufferTask.Wait();
+
+            if (bufferTask.IsCompletedSuccessfully)
+                result = System.Text.Encoding.Default.GetString(buffer);
 
             return result;
         }

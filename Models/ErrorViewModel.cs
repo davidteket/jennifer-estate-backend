@@ -1,6 +1,4 @@
-using System;
-
-namespace backend.Models
+namespace DunakanyarHouseIngatlan.Models
 {
     public class ErrorViewModel
     {

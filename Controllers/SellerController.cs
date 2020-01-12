@@ -2,15 +2,23 @@ using Microsoft.AspNetCore.Mvc;
 
 using Newtonsoft.Json;
 
-using backend.DataAccess;
-using backend.DataAccess.Entities;
-using backend.Models;
+using DunakanyarHouseIngatlan.DataAccess;
+using DunakanyarHouseIngatlan.DataAccess.Entities;
+using DunakanyarHouseIngatlan.Models;
+using DunakanyarHouseIngatlan.Services;
 
-namespace backend.Controllers
+namespace DunakanyarHouseIngatlan.Controllers
 {
     public class Seller : Controller
     {
-        private IRepository repo = new Repository();
+        private IRepository _repo;
+        private Serializer _serializer;
+
+        public Seller(IRepository implementation)
+        {
+            _serializer = new Serializer();
+            _repo = implementation;
+        }
 
         #region WebAPI POST
 
@@ -21,22 +29,16 @@ namespace backend.Controllers
         {
             var response = new ItemPostedResultModel();
 
-            int length = (int) HttpContext.Request.ContentLength;
-            byte[] buffer = new byte[length];
-            var bufferTask = HttpContext.Request.Body.ReadAsync(buffer, 0, length);
-            bufferTask.Wait();
-
-            string data = null;
+            string data = _serializer.GetRequestContent(this.HttpContext);
             var clientRequest = new ClientRequest();
 
-            if (bufferTask.IsCompletedSuccessfully)
+            if (data != null)
             {
-                data = System.Text.Encoding.Default.GetString(buffer);
                 clientRequest = (ClientRequest) JsonConvert.DeserializeObject(data, typeof(ClientRequest));
+                _repo.AddClientRequest(clientRequest);
 
-                repo.AddClientRequest(clientRequest);
-                response.Success = true;
                 response.Message = "Az értékesítési szándék rögzítésre került.";
+                response.Success = true;
             }
 
             return JsonConvert.SerializeObject(response);

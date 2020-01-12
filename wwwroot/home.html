@@ -25,16 +25,16 @@
 
     </head>
 
-    <body class="container site-background home">
+    <body class="site-background home">
 
-            <div id="contents">
+            <div id="contents" class='container'>
                 
                     <div id="menu-strip"></div>
                     <div id="image-slider"></div>
 
                     <div class='site-overlayitem row'>
 
-                        <div class='col-sm-6 text-center m-1'>
+                        <div class='col-sm-4 text-center m-1'>
 
                             <div class='search-btn-container'>
                                     <div id='search-btn' class='btn btn-primary site-link-pointer hvr-grow'>
@@ -44,6 +44,19 @@
                             </div>
 
                         </div>
+
+                        <span class="col-sm-2 text-center m-1">
+
+                            <button id="add-new-estate" class="btn btn-success hvr-grow" data-toggle="modal"
+                                    data-target="#new-estate-modal" type="button">
+            
+                                    <span class="fas fa-plus"></span>
+                                    &nbsp;
+                                    Új Hirdetés&nbsp;
+            
+                            </button>
+            
+                        </span>    
 
 
                         <div class='col-sm-2 text-center m-1'>
@@ -70,7 +83,7 @@
 
                     <div id="search-module" class="site-overlayitem row"></div>
                     <div id="advanced-search-container"></div>
-                    <div id="login-strip"></div>
+                    
                     <div id="estate-lister"></div>
 
                     <!-- További ingatlanok gomb. -->
@@ -85,8 +98,9 @@
                     </div>
 
                     <div id="employee-lister"></div>
-                    <div id="footer-strip"></div>
+                    
             </div>
+            <div id="footer-strip"></div>
 
             <!-- post procesing-->
             <script src="lib/bootstrap.js"></script>

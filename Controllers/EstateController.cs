@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 
 using Newtonsoft.Json;
 
@@ -8,26 +9,59 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.IO;
 
-using backend.DataAccess.Entities;
-using backend.Models;
-using backend.DataAccess;
+using DunakanyarHouseIngatlan.DataAccess.Entities;
+using DunakanyarHouseIngatlan.Models;
+using DunakanyarHouseIngatlan.DataAccess.Entities.Identity;
+using DunakanyarHouseIngatlan.DataAccess;
+using DunakanyarHouseIngatlan.Services;
 
-namespace backend.Controllers
+namespace DunakanyarHouseIngatlan.Controllers
 {
     public class EstateController : Controller
     {
-        private IRepository _repo = new Repository();
+        private IRepository _repo;
+        private Serializer _serializer;
+        private SignInManager<User> _signInManager;
+
+        public EstateController(IRepository repo, SignInManager<User> signInManager)
+        {
+            _serializer = new Serializer();
+            _repo = repo;
+            _signInManager = signInManager;
+        }
+
 
         #region WebAPI GET  
+ 
+        // Hirdetések darabszámának lekérdezése.
+        //
+        [HttpGet]
+        public string Count()
+        {
+            var response = new ItemPostedResultModel();
 
-        [HttpGet] 
+            int count = _repo.CountEstates();
+
+            if (!(count >= 0))
+                response.Message = "Hiba történt az ingatlanok darabszámának lekérdezésekor.";
+            else {
+                response.ItemId = count.ToString();
+                response.Message = "Az elérhető ingatlanok darabszáma sikeresen lekérve.";
+                response.Success = true;
+
+            }
+
+            return JsonConvert.SerializeObject(response);
+        }
+
         //  Adott darabszámú ingatlan lekérés.
         //
-        public string GetEstates(int from = 1, int limit = 10)
+        [HttpGet]
+        public string Load(int? fromId = null, int limit = 20)
         {
             var response = new List<EstateOverviewViewModel>();
 
-            List<Estate> estates = _repo.GetEstates(from, limit);
+            List<Estate> estates = _repo.GetEstates(fromId, limit);
             foreach (Estate estate in estates)
             {
                 var estateOverview = new EstateOverviewViewModel();
@@ -62,38 +96,48 @@ namespace backend.Controllers
 
             return JsonConvert.SerializeObject(response);
         }
-
-        [HttpGet]   
+  
         //  Adott ingatlan lekérés.
         //
-        public string Detail(int estateId)
+        [HttpGet] 
+        public string Detail(int? estateId = null)
         {
             var response = new EstateDetailsViewModel();
 
-            Estate estate = _repo.GetEstate(estateId);
-            Electricity electricity = _repo.GetElectricity(estateId);
-            HeatingSystem heating = _repo.GetHeatingSystem(estateId);
-            Address address = _repo.GetAddress(estateId);
-            WaterSystem water = _repo.GetWaterSystem(estateId);
-            PublicService services = _repo.GetPublicService(estateId);
-            Advertisement advertisement = _repo.GetAdvertisement(estateId);
-            List<GenericImage> images = _repo.GetEstateImages(estateId);
+            Estate estate = null;
+            int id = -1;
 
-            response.Estate = estate;
-            response.Electricity = electricity;
-            response.Heating = heating;
-            response.Address = address;
-            response.Water = water;
-            response.Services = services;
-            response.Advertisement = advertisement;
-            response.Images = images;
+            if (estateId != null) {
+                id = (int) estateId;
+                estate = _repo.GetEstate(id);
+            }
+
+            if (estate == null)
+                response = null;
+            else 
+            {
+                Electricity electricity = _repo.GetElectricity(id);
+                HeatingSystem heating = _repo.GetHeatingSystem(id);
+                Address address = _repo.GetAddress(id);
+                PublicService services = _repo.GetPublicService(id);
+                Advertisement advertisement = _repo.GetAdvertisement(id);
+                List<GenericImage> images = _repo.GetEstateImages(id);
+
+                response.Estate = estate;
+                response.Electricity = electricity;
+                response.Heating = heating;
+                response.Address = address;
+                response.Services = services;
+                response.Advertisement = advertisement;
+                response.Images = images;
+            }
 
             return JsonConvert.SerializeObject(response);
         }
-
-        [HttpGet]   
+  
         //  Adott ingatlan fűtés-részletek.
         //
+        [HttpGet] 
         public string HeatingDetail(int estateId)
         {
             var response = new HeatingSystemViewModel();
@@ -103,48 +147,55 @@ namespace backend.Controllers
             response.ByRemote = heating.ByRemote;
             response.ByGas = heating.ByGas;
             response.ByElectricity = heating.ByElectricity;
-            response.FloorHeating = heating.FloorHeating;
+            response.ByFloorHeating = heating.ByFloorHeating;
+            response.ByCombined = heating.ByCombined;
+            response.ByGasConvector = heating.ByGasConvector;
+            response.ByNetworked = heating.ByNetworked;
+            response.ByChimney = heating.ByChimney;
+            response.ByCirculation = heating.ByCirculation;
+            response.ByCockle = heating.ByCockle;
 
             return JsonConvert.SerializeObject(response);
         }
-
-        [HttpGet]   
+  
         //  Adott ingatlan villamosság-részletek.
         //
+        [HttpGet] 
         public string ElectricityDetail(int estateId)
         {
             var response = new ElectricityViewModel();
             Electricity electricity = _repo.GetElectricity(estateId);
 
             response.SunCollector = electricity.SunCollector;
-            response.Thermal = electricity.Thermal;
+            response.PowerWall = electricity.PowerWall;
             response.Networked = electricity.Networked;
 
             return JsonConvert.SerializeObject(response);
         }
-
-        [HttpGet]  
+ 
         //  Adott ingatlan szolgáltatás-részletek.
         //
+        [HttpGet] 
         public string PublicServiceDetail(int estateId)
         {
             var response = new PublicServiceViewModel();
             PublicService publicService = _repo.GetPublicService(estateId);
 
-            response.Grocery = publicService.Grocery;
-            response.GasStation = publicService.GasStation;
-            response.Transport = publicService.Transport;
-            response.DrugStore = publicService.DrugStore;
-            response.School = publicService.School;
-            response.MailDepot = publicService.MailDepot;
-            response.MailDepot = publicService.Bank;
+            response.HasGroceryNearby = publicService.HasGroceryNearby;
+            response.HasGasStationNearby = publicService.HasGasStationNearby;
+            response.HasTransportNearby = publicService.HasTransportNearby;
+            response.HasDrugStoreNearby = publicService.HasDrugStoreNearby;
+            response.HasSchoolNearby = publicService.HasSchoolNearby;
+            response.HasMailDepotNearby = publicService.HasMailDepotNearby;
+            response.HasMailDepotNearby = publicService.HasBankNearby;
+            response.HasEntertainmentServicesNearby = publicService.HasEntertainmentServicesNearby;
 
             return JsonConvert.SerializeObject(response);
         }
 
-        [HttpGet]
         // Véletlenszerű képek.
         //
+        [HttpGet]
         public string RandomShowCase()
         {
             List<string> response = null;
@@ -153,92 +204,94 @@ namespace backend.Controllers
             return JsonConvert.SerializeObject(response);
         }
 
+        // Keresés.
+        //
+        [HttpGet]
+        public string Search()
+        {
+            var response = new List<EstateOverviewViewModel>();
+
+            
+
+
+            return JsonConvert.SerializeObject(response);
+        }
+
         #endregion
         #region WebAPI POST
 
-        [HttpPost]
         // Új hirdetés.
         //
+        [HttpPost]
         public string Upload()
         {
             var response = new ItemPostedResultModel();
 
-            if (!Startup.SignInManager.IsSignedIn(User)) {
+            if (User == null || !_signInManager.IsSignedIn(User)) 
+            {
+                response.ItemId = null;
                 response.Message = "Bejelentkezés szükséges.";
-                goto cancelUpload;
+                response.Success = false;
+
+                System.Console.WriteLine(response.Message);
             }
-
-            var uploadable = new UploadWrapperModel();
-            string data = null;
-
-            int length = (int) this.HttpContext.Request.ContentLength;
-            byte[] buffer = new byte[length];
-            
-            var bufferReaderTask = this.HttpContext.Request.Body.ReadAsync(buffer, 0, length);
-            bufferReaderTask.Wait();
-
-            if (bufferReaderTask.IsCompletedSuccessfully)
+            else 
             {
-                data = System.Text.Encoding.Default.GetString(buffer);
-                uploadable = (UploadWrapperModel) JsonConvert.DeserializeObject(data, typeof(UploadWrapperModel), new JsonSerializerSettings());
-            }
+                var uploadable = new UploadWrapperModel();
+                string data = _serializer.GetRequestContent(this.HttpContext);
 
-            System.Func<object, bool> addEstateAdvertisementAsync = delegate(object toAdd) 
-            {
-                var wrapper = (UploadWrapperModel) toAdd;
+                if (data != null)
+                    uploadable = (UploadWrapperModel) JsonConvert.DeserializeObject(data, typeof(UploadWrapperModel), new JsonSerializerSettings());
 
-                int estateId = _repo.AddEstate(wrapper.Estate);
-
-                if (estateId != 0)
+                System.Func<object, bool> addEstateAdvertisementAsync = delegate(object toAdd) 
                 {
-                    _repo.AddAddress(wrapper.Address, estateId);
-                    _repo.AddElectricity(wrapper.Electricity, estateId);
-                    _repo.AddHeatingSystem(wrapper.Heating, estateId);
-                    _repo.AddPublicService(wrapper.PublicService, estateId);
-                    _repo.AddWaterSystem(wrapper.Water, estateId);
-                    _repo.AddAdvertisement(wrapper.Advertisement, estateId, wrapper.Estate.AdvertiserId);
-                }
+                    var wrapper = (UploadWrapperModel) toAdd;
 
-                response.ItemId = estateId.ToString();
-                response.Success = true;
+                    int estateId = _repo.AddEstate(wrapper.Estate);
 
-                return true;
-            };
+                    if (estateId != 0)
+                    {
+                        _repo.AddAddress(wrapper.Address, estateId);
+                        _repo.AddElectricity(wrapper.Electricity, estateId);
+                        _repo.AddHeatingSystem(wrapper.Heating, estateId);
+                        _repo.AddPublicService(wrapper.PublicService, estateId);
+                        _repo.AddAdvertisement(wrapper.Advertisement, estateId, wrapper.Estate.AdvertiserId);
+                    }
 
-            var uploadTask = new Task<bool>(addEstateAdvertisementAsync, uploadable);
-            uploadTask.Start();
-            uploadTask.Wait();
+                    response.ItemId = estateId.ToString();
+                    response.Message = "Sikeres hirdetés feltöltés.";
+                    response.Success = true;
 
-            if (!uploadTask.IsCompletedSuccessfully)
-                response = new ItemPostedResultModel();
+                    System.Console.WriteLine(response.Message);
+                    return true;
+                };
+
+                var uploadTask = new Task<bool>(addEstateAdvertisementAsync, uploadable);
+                uploadTask.Start();
+                uploadTask.Wait();
+
+                if (!uploadTask.IsCompletedSuccessfully)
+                    response.Success = true;
+            }
             
-            cancelUpload:
             return JsonConvert.SerializeObject(response);
         }
 
-        [HttpPost]
         // Hirdetés módosítás.
         //
+        [HttpPost]
         public string Modify()
         {
             var response = new ItemPostedResultModel();
 
-            if (!Startup.SignInManager.IsSignedIn(User)) {
+            if (!Startup.SignInManager.IsSignedIn(User))
                 response.Message = "Bejelentkezés szükséges.";
-                goto cancelModify;
-            }
 
-            var model = new UploadWrapperModel();
-            
-            string data = null;            
-            int length = (int) this.HttpContext.Request.ContentLength;
-            byte[] buffer = new byte[length];
-            var bufferReaderTask = this.HttpContext.Request.Body.ReadAsync(buffer, 0, length);
-            bufferReaderTask.Wait();
+            var model = new UploadWrapperModel();            
+            string data = _serializer.GetRequestContent(this.HttpContext);
 
-            if (bufferReaderTask.IsCompletedSuccessfully)
+            if (data!= null)
             {
-                data = System.Text.Encoding.Default.GetString(buffer);
                 model = (UploadWrapperModel) JsonConvert.DeserializeObject(data, typeof(UploadWrapperModel));
 
                 _repo.UpdateEstate(model.Estate);
@@ -246,50 +299,54 @@ namespace backend.Controllers
                 _repo.UpdateElectricity(model.Electricity);
                 _repo.UpdateHeatingSystem(model.Heating);
                 _repo.UpdatePublicService(model.PublicService);
-                _repo.UpdateWaterSystem(model.Water);
                 _repo.UpdateAdvertisement(model.Advertisement);
 
+                response.ItemId = model.Estate.Id.ToString();
                 response.Message = "A hirdetés sikeresen módosítva lett.";
                 response.Success = true;
-                response.ItemId = model.Estate.Id.ToString();
             }
-            else {
-                response.Message = "Hiba történt a hirdetés módosítása közben.";
-            }
-
-            cancelModify:
+            else
+                response.Message = "Hiba történt a hirdetés módosításakor.";
+                
             return JsonConvert.SerializeObject(response);
         }
 
-        [HttpPost]
         // Hirdetés törlés.
         //
+        [HttpPost]
         public string Delete(int estateId)
         {
             var response = new ItemPostedResultModel();
 
-            if (!Startup.SignInManager.IsSignedIn(User)) {
+            if (!Startup.SignInManager.IsSignedIn(User))
                 response.Message = "Bejelentkezés szükséges.";
-                goto cancelDelete;
+
+            bool result = _repo.DeleteEstate(estateId);
+            if (result == true) 
+            {
+                response.ItemId = estateId.ToString();
+                response.Message = "A hirdetés törlése sikeresen megtörtént.";
+                response.Success = true;
             }
-
-            response.Success = _repo.DeleteEstate(estateId);
-            response.ItemId = estateId.ToString(); 
-
-            cancelDelete:
+            else
+                response.Message = "Hiba történt a hirdetés törlésekor.";
+            
             return JsonConvert.SerializeObject(response);
         }
 
-        [HttpPost]
         // Képfeltöltés
         //
+        [HttpPost]
         public string ImageUpload()
         {
             var response = new ItemPostedResultModel();
 
             var images = HttpContext.Request.Form.Files;
-
             long size = images.Sum(f => f.Length);
+            int queued = HttpContext.Request.Form.Files.Count();
+            string[] messages = new string[queued];
+            int queueNumber = 0;
+
             foreach (IFormFile image in images)
             {
                 if (image.Length > 0)
@@ -323,18 +380,25 @@ namespace backend.Controllers
 
                             bool storeSuccess = _repo.AddImage(imageData);
 
-                            if (storeSuccess) {
+                            if (storeSuccess) 
+                            {
                                 response.ItemId = imageData.Id;
+                                messages[queueNumber] = image.FileName;
                                 response.Success = true;
-                                response.Message = "A képfeltöltés sikeresen megtörtént.";
+                                ++queueNumber;
                             }
                         }                        
                         else {
-                            response.Message = "Sikertelen képfeltöltés.";
+                            response.Message = "Egy vagy több kép feltöltése nem sikerült.";
+                            response.Success = false;
+                            break;
                         }
                     }
                 }
             }
+
+            if (response.Success == true)
+                response.Message = JsonConvert.SerializeObject(messages);
 
             return JsonConvert.SerializeObject(response);
         }

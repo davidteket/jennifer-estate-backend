@@ -2,7 +2,7 @@ using System;
 using System.Net;
 using System.Net.Mail;
 
-namespace backend.Services
+namespace DunakanyarHouseIngatlan.Services
 {
     public class Email
     {

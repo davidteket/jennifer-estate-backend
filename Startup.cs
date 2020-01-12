@@ -2,16 +2,17 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
 
-using backend.Services;
-using backend.DataAccess.Entities.Identity;
-using backend.DataAccess;
+using DunakanyarHouseIngatlan.Services;
+using DunakanyarHouseIngatlan.DataAccess;
+using DunakanyarHouseIngatlan.DataAccess.Entities.Identity;
 
-namespace backend
+namespace DunakanyarHouseIngatlan
 {
     public class Startup
     {
@@ -72,6 +73,7 @@ namespace backend
         public static UserManager<User> UserManager;
         public static SignInManager<User> SignInManager;
         public static RoleManager<UserRole> RoleManager;
+        
 
         // Alkalmazás konfiguráció beállítások.
         //
@@ -80,13 +82,14 @@ namespace backend
             Configuration = configuration;
 
             _serializer = new Serializer();
-            _developerConnectionString = _serializer.GetApplication("DeployConnectionString");
+            _developerConnectionString = _serializer.GetApplication("DeveloperConnectionString");
             _developerUser = _serializer.GetApplication("User");
             _developerPassword = _serializer.GetApplication("Password");
             _developerRole = _serializer.GetApplication("Role");
             _developerFirstName = _serializer.GetApplication("FirstName");
             _developerLastName = _serializer.GetApplication("LastName");
             _developerEmail = _serializer.GetApplication("Email");
+
         }
         
         public void ConfigureServices(IServiceCollection services)
@@ -98,12 +101,17 @@ namespace backend
                 
             });
 
-            // Entity Framework szolgáltatás.
+            // Dependency Injection.
+            //
+            services.AddTransient<IRepository, Repository>();
+            services.AddTransient<SignInManager<User>, SignInManager<User>>();
+
+            // Entity Framework.
             //
             services.AddDbContext<JenniferEstateContext>(options => options.UseSqlServer(_developerConnectionString, null));
 
 
-            // Identity szolgáltatás.
+            // Identity.
             //
             var identity = services.AddIdentity<User, UserRole>()
                                    .AddEntityFrameworkStores<JenniferEstateContext>()
@@ -117,6 +125,13 @@ namespace backend
 
             RoleManager = services.BuildServiceProvider()
                                   .GetService(typeof(RoleManager<UserRole>)) as RoleManager<UserRole>;
+
+            // Naplózás.
+            //
+            services.AddLogging(logging => 
+            {
+                // TODO
+            });
 
             // Identity konfiguráció.
             //
@@ -216,7 +231,7 @@ namespace backend
             app.UseMvc(configureRoutes => configureRoutes
                             .MapRoute(
                                 "default",
-                                "/"
+                                "/home.html"
                             )
 
 

@@ -1,6 +1,6 @@
-using backend.DataAccess.Entities;
+using DunakanyarHouseIngatlan.DataAccess.Entities;
 
-namespace backend.Models
+namespace DunakanyarHouseIngatlan.Models
 {
     public class UploadWrapperModel
     {
@@ -9,7 +9,6 @@ namespace backend.Models
         public Electricity Electricity { get; set; }
         public HeatingSystem Heating { get; set; }
         public PublicService PublicService { get; set; }
-        public WaterSystem Water { get; set; }
         public Advertisement Advertisement { get; set; }
     }
 }

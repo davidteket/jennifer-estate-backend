@@ -6,13 +6,14 @@
         <div class="col-sm-4 mb-3 text-center">
             <span class="form-group">
 
-                <label class="font-weight-bold">Típus:</label>
+                <label>Típus:</label>
 
                 <select class="form-control">
                     <option>Kertesház</option>
-                    <option>Lakás</option>
+                    <option>Tégla Lakás</option>
+                    <option>Panel Lakás</option>
                     <option>Telek</option>
-                    <option>Iroda</option>
+                    <option>Irodahelység</option>
                 </select>
 
             </span>
@@ -22,8 +23,8 @@
         <div class="col-sm-3 text-center">
             <span class="form-group">
 
-                <div class="container mb-3">
-                        <label class="font-weight-bold">Értéktartomány:</label>
+                <div class="mb-3">
+                        <label>Értéktartomány:</label>
                         <div>
                             <input type="text" placeholder="-tól" class="form-control"/>
                         </div>
@@ -40,7 +41,7 @@
             <span class="form-group">
 
                 <div>
-                    <label class="font-weight-bold">Település:</label>
+                    <label>Település:</label>
                     <input type="text" placeholder="pld. Siófok" class="form-control"/>
                 </div>
 
@@ -52,52 +53,38 @@
     <div id="search-buttons" class="row">
 
         <!-- Mégsem. -->
-        <span class='col-sm-3 text-center'>
+        <span class='col-sm-4 text-center'>
 
             <button id='hide-simple-search-container' type='button'
                     class='btn btn-danger mt-2 hvr-grow'>
                     <span class='fa fa-backspace'></span>
-                    &nbsp;&nbsp;Mégsem
+                    &nbsp;&nbsp;Kereső Elrejtése
 
             </button>
 
         </span>
 
         <!-- Összetett keresés. -->
-        <span class="col-sm-3 text-center">
+        <span class="col-sm-4 text-center">
             
                 <button id="advanced-search" type="button"
                         class="btn btn-dark hvr-grow mt-2">
     
                     <span class="fas fa-list"></span>
-                    Részletes
+                    Részletes Kereső
     
             </button>
     
         </span>
 
-        <!-- Új ingatlan-hirdetés -->
-        <span class="col-sm-3 text-center">
-
-                <button id="add-new-estate" class="btn btn-warning hvr-grow mt-2" data-toggle="modal"
-                        data-target="#new-estate-modal" type="button">
-
-                        <span class="fas fa-plus"></span>
-                        &nbsp;
-                        Új Hirdetés&nbsp;
-
-                </button>
-
-        </span>    
-
             <!-- Keresés. -->
-        <span class="col-sm-3 text-center">
+        <span class="col-sm-4 text-center">
 
             <button id="start-simple-search" class="btn btn-primary hvr-grow mt-2" type="button">
 
                 <span class="fas fa-search"></span>
                 &nbsp;
-                Keresés&nbsp;
+                Keresés Indítása&nbsp;
 
             </button>
 
@@ -105,289 +92,373 @@
 
     </div>
 
-        <div>
+</div>
 
-                <!-- Új ingatlan hozzáadása ablak. -->
-                <div class="modal fade" id="new-estate-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div>
 
-                        <div class="modal-dialog modal-lg" role="document">
-                                <div class="modal-content">
+    <!-- Új ingatlan hozzáadása ablak. -->
+    <div class="modal fade" id="new-estate-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 
-                                        <div class="modal-header">
+            <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
 
-                                                <h4 class="modal-title" id="exampleModalLabel">
-                                                        Új Hirdetés Feltöltése
-                                                </h4>
+                            <div class="modal-header">
 
-                                                <button id='close-upload-dialog-btn' type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                        <span aria-hidden="true">&times;</span>
-                                                </button>
+                                    <h4 class="modal-title" id="exampleModalLabel">
+                                            <span class="fas fa-home"></span>
+                                            &nbsp;&nbsp;
+                                            Új Hirdetés...
+                                    </h4>
 
-                                        </div> <!-- fejléc -->
+                                    <button id='close-upload-dialog-btn' type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                    </button>
 
-                                        <div class="modal-body">
+                            </div> <!-- fejléc -->
 
-                                            <div class="container">
+                            <div class="modal-body">
 
-                                                    <div class="row">
+                                <div class="container">
 
-                                                        <div class="form-group col">
-                                                            <label for="new-estate-price">Ár:</label>
-                                                            <input type="text" id="new-estate-price" class="form-control" placeholder="pld. 1234567"/>
-                                                        </div>
+                                        <div class="row">
 
-                                                        <div class="form-group col">
-                                                            <label for="new-estate-squarefeet">Négyzetméter:</label>
-                                                            <input type="text" id="new-estate-squarefeet" class="form-control" placeholder="pld. 1200"/>
-                                                        </div>
-
-                                                        <div class="form-group col">
-                                                                <label for="new-estate-category">Kategória:</label>
-                                                                <select id="new-estate-category" class="form-control">
-                                                                        <option>Kertesház</option>
-                                                                        <option>Lakás</option>
-                                                                        <option>Telek</option>
-                                                                        <option>Iroda</option>
-                                                                </select>
-                                                        </div>
-
-                                                    </div>
-
-                                                    <div class="row mt-3">
-    
-                                                        <div class="form-group col">
-                                                            <label for="new-estate-builtat">Építve:</label>
-                                                            <input type="text" id="new-estate-builtat" class="form-control" placeholder="év"/>
-                                                        </div>
-
-                                                        <div class="form-group col">
-                                                            <label for="new-estate-refurbishedat">Felújítva:</label>
-                                                            <input type="text" id="new-estate-refurbishedat" class="form-control" placeholder="év"/>
-                                                        </div>
-
-                                                        <div class="form-group col">
-                                                                <label for="new-estate-quality">Minőség:</label>
-                                                                <select id="new-estate-quality" class="form-control">
-                                                                        <option>Új</option>
-                                                                        <option>Felújított</option>
-                                                                        <option>Felújítandó</option>
-                                                                        <option>Használt</option>
-                                                                </select>
-                                                        </div>
-    
-                                                    </div>
-
-                                                    <div class="row mt-3">
-    
-                                                            <div class="form-group col">
-                                                                <label for="new-estate-roomcount">Szobák:</label>
-                                                                <input type="text" id="new-estate-roomcount" class="form-control" placeholder="darab"/>
-                                                            </div>
-    
-                                                            <div class="form-group col">
-                                                                <label for="new-estate-kitchencount">Konyhák:</label>
-                                                                <input type="text" id="new-estate-kitchencount" class="form-control" placeholder="darab"/>
-                                                            </div>
-    
-                                                            <div class="form-group col">
-                                                                    <label for="new-estate-bathroomcount">Fürdőszobák:</label>
-                                                                    <input type="text" id="new-estate-bathroomcount" class="form-control" placeholder="darab"/>
-                                                            </div>
-        
-                                                    </div>
-
-                                                    <div class="row mt-3">
-    
-                                                            <div class="form-group col">
-                                                                <label for="new-estate-floorcount">Szintek:</label>
-                                                                <input type="text" id="new-estate-floorcount" class="form-control" placeholder="darab"/>
-                                                            </div>
-
-                                                            <div class="form-group col">
-                                                                <label for="new-estate-propertysquarefeet">Telek:</label>
-                                                                <input type="text" id="new-estate-propertysquarefeet" class="form-control" placeholder="négyzetméter"/>
-                                                            </div>
-
-                                                            <div class="form-group col">
-                                                                <label for="new-estate-garagesquarefeet">Garázs:</label>
-                                                                <input type="text" id="new-estate-garagesquarefeet" class="form-control" placeholder="négyzetméter"/>
-                                                            </div>
-        
-                                                    </div>
-
-                                                    <div class="row mt-3">
-    
-                                                            <div class="form-group col">
-                                                                <label for="new-estate-gardensquarefeet">Kert:</label>
-                                                                <input type="text" id="new-estate-gardensquarefeet" class="form-control" placeholder="négyzetméter"/>
-                                                            </div>
-
-                                                            <div class="form-group col">
-                                                                <label for="new-estate-terracesquarefeet">Terasz:</label>
-                                                                <input type="text" id="new-estate-terracesquarefeet" class="form-control" placeholder="négyzetméter"/>
-                                                            </div>
-        
-                                                    </div>
-
-                                                    <div class="row mt-3">
-                                                            <div class="col tags">
-                                                            
-                                                                    <span class="tag p-2 m-1 hvr-grow" id="new-estate-hasgarage" value="0">Garázs</span>
-                                                                    <span class="tag p-2 m-1 hvr-grow" id="new-estate-haselevator" value="0">Lift</span>
-                                                                    <span class="tag p-2 m-1 hvr-grow" id="new-estate-hasgarden" value="0">Kert</span>
-                                                                    <span class="tag p-2 m-1 hvr-grow" id="new-estate-hasterrace" value="0">Terasz</span>
-                                                                    <span class="tag p-2 m-1 hvr-grow" id="new-estate-hasbasement" value="0">Pince</span>
-                                                                    <span class="tag p-2 m-1 hvr-grow" id="new-estate-hascomfort" value="0">Összkomfortos</span>
-                                                                    <span class="tag p-2 m-1 hvr-grow" id="new-estate-hassuncollector" value="0">Napkollektor</span>
-                                                                    <span class="tag p-2 m-1 hvr-grow" id="new-estate-hasnetworkedheating" value="0">Hálózati Fűtés</span>
-                                                                    <span class="tag p-2 m-1 hvr-grow" id="new-estate-haswoodenheating" value="0">Fatüzelésű</span>
-                                                                    <span class="tag p-2 m-1 hvr-grow" id="new-estate-hasremoteheating" value="0">Távfűtéses</span>
-                                                                    <span class="tag p-2 m-1 hvr-grow" id="new-estate-hasgasheating" value="0">Gázfűtéses</span>
-                                                                    <span class="tag p-2 m-1 hvr-grow" id="new-estate-haselectricityheating" value="0">Villamos Fűtésű</span>
-                                                                    <span class="tag p-2 m-1 hvr-grow" id="new-estate-hasfloorheating" value="0">Padlófűtéses</span>
-                                                                    <span class="tag p-2 m-1 hvr-grow" id="new-estate-hasgrocerynearby" value="0">Áruház</span>
-                                                                    <span class="tag p-2 m-1 hvr-grow" id="new-estate-haspetrolstationnearby" value="0">Benzinkút</span>
-                                                                    <span class="tag p-2 m-1 hvr-grow" id="new-estate-haspublictransportnearby" value="0">Tömegközlekedés</span>
-                                                                    <span class="tag p-2 m-1 hvr-grow" id="new-estate-hashaspharmacynearby" value="0">Gyógyszertár</span>
-                                                                    <span class="tag p-2 m-1 hvr-grow" id="new-estate-hasschoolnearby" value="0">Iskola</span>
-                                                                    <span class="tag p-2 m-1 hvr-grow" id="new-estate-hasmaildepotnearby" value="0">Posta</span>
-                                                                    <span class="tag p-2 m-1 hvr-grow" id="new-estate-hasbanknearby" value="0">Bank</span>
-                                            
-                                                            </div>  
-                                                    </div>
-
-                                                    <div class="row mt-3">
-    
-                                                            <div class="form-group col">
-                                                                <label for="new-estate-country">Ország:</label>
-                                                                <input type="text" id="new-estate-country" class="form-control" placeholder="pld. Magyarország"/>
-                                                            </div>
-
-                                                            <div class="form-group col">
-                                                                <label for="new-estate-county">Megye:</label>
-                                                                <input type="text" id="new-estate-county" class="form-control" placeholder="pld. Pest"/>
-                                                            </div>
-
-                                                            <div class="form-group col">
-                                                                <label for="new-estate-city">Város:</label>
-                                                                <input type="text" id="new-estate-city" class="form-control" placeholder="pld. Budapest"/>
-                                                            </div>
-    
-                                                    </div>
-
-                                                    <div class="row mt-3">
-    
-                                                            <div class="form-group col">
-                                                                <label for="new-estate-postcode">Irányítószám:</label>
-                                                                <input type="text" id="new-estate-postcode" class="form-control" placeholder="pld. 1105"/>
-                                                            </div>
-
-                                                            <div class="form-group col">
-                                                                <label for="new-estate-street">Utca:</label>
-                                                                <input type="text" id="new-estate-street" class="form-control" placeholder="pld. Andrássy Út"/>
-                                                            </div>
-
-                                                            <div class="form-group col">
-                                                                <label for="new-estate-housenumber">Házszám:</label>
-                                                                <input type="text" id="new-estate-housenumber" class="form-control" placeholder="pld. 28"/>
-                                                            </div>
-    
-                                                    </div>
-
-                                                    <div class="row mt-3">
-    
-                                                            <div class="form-group col">
-                                                                <label for="new-estate-floor">Emelet:</label>
-                                                                <input type="text" id="new-estate-floor" class="form-control" placeholder="pld. 2"/>
-                                                            </div>
-
-                                                            <div class="form-group col">
-                                                                <label for="new-estate-door">Ajtó:</label>
-                                                                <input type="text" id="new-estate-door" class="form-control" placeholder="pld. 8"/>
-                                                            </div>
-    
-                                                    </div>
-
-                                                    <div class="row mt-3">
-    
-                                                            <div class="form-group col">
-                                                                <label for="new-estate-adtitle">Hirdetés Címe:</label>
-                                                                <input type="text" id="new-estate-adtitle" class="form-control" placeholder="leírás..."/>
-                                                            </div>
-
-                                                            <div class="form-group col">
-                                                                <label for="new-estate-adtype">Hirdetés Típusa:</label>
-                                                                <select id="new-estate-adtype" class="form-control">
-                                                                        <option>Eladó</option>
-                                                                        <option>Kiadó</option>
-                                                                </select>
-                                                            </div>
-    
-                                                    </div>
-
-                                                    <div class="row mt-3">
-
-                                                            <div class="form-group col">
-                                                                <label for="new-estate-addescr">Hirdetés Szövege:</label>
-                                                                <textarea id="new-estate-addescr" class="form-control" placeholder="leírás..."></textarea>
-                                                            </div>
-    
-                                                    </div>
-                                                        
+                                            <div class="form-group col">
+                                                <label for="new-estate-price">Ár:</label>
+                                                <input type="text" id="new-estate-price" class="form-control" placeholder="pld. 1234567"/>
                                             </div>
 
-                                        </div> <!-- tartalom -->
+                                            <div class="form-group col">
+                                                <label for="new-estate-squarefeet">Alapterület:</label>
+                                                <input type="text" id="new-estate-squarefeet" class="form-control" placeholder="m^2"/>
+                                            </div>
 
-                                        <div class="modal-footer">
+                                            <div class="form-group col-sm-5">
+                                                    <label for="new-estate-category">Kategória:</label>
+                                                    <select id="new-estate-category" class="form-control">
+                                                            <option>Kertesház</option>
+                                                            <option>Tégla Lakás</option>
+                                                            <option>Panel Lakás</option>
+                                                            <option>Telek</option>
+                                                            <option>Irodahelység</option>
+                                                    </select>
+                                            </div>
 
-                                                <div class="container">
-                                                        <div class="row">
-                                                                
-                                                                <div class="alert alert-danger" role="alert">
-                                                                    Figyelem! A hirdetés csak akkor jelenik meg, ha legalább 4 kép feltöltésre került.
-                                                                    <br/>
-                                                                    Amennyiben megfelelőnek találod a megadott adatokat, úgy kérlek kattints a Jóváhagyás gombra!
-                                                                    <br/>
-                                                                    <br/>
-                                                                    <span class="font-weight-bold">
-                                                                        Képeket belépett státuszú felhasználó felhasználó tud feltölteni a hirdetés adatlapján.
-                                                                    </span>
-                                                                </div>
+                                        </div>
 
-                                                                <span class="col">
+                                        <div class="row mt-3">
 
-                                                                        <button id="cancel-upload-estate-btn" class="btn btn-danger float-left mr-3 hvr-grow" type="button">
-                
-                                                                                <span class="fas fa-backspace"></span>
-                                                                                &nbsp;
-                                                                                Mégsem&nbsp;&nbsp;
-                                                                                
-                                                                        </button>
+                                            <div class="form-group col">
+                                                <label for="new-estate-builtat">Építve:</label>
+                                                <input type="text" id="new-estate-builtat" class="form-control" placeholder="év"/>
+                                            </div>
 
-                                                                </span>
-                                                                <span class="col">
+                                            <div class="form-group col">
+                                                <label for="new-estate-refurbishedat">Felújítva:</label>
+                                                <input type="text" id="new-estate-refurbishedat" class="form-control" placeholder="év"/>
+                                            </div>
 
-                                                                        <button id="upload-estate-btn"
-                                                                                type="button" 
-                                                                                class="btn btn-success hvr-grow float-right">
-                                                                                <span class="fas fa-save"></span>
-                                                                                &nbsp;
-                                                                                Jóváhagyás
-                                                                        </button>
-                                                                </span>
+                                            <div class="form-group col-sm-5">
+                                                    <label for="new-estate-quality">Minőség:</label>
+                                                    <select id="new-estate-quality" class="form-control">
+                                                            <option>Új Építésű</option>
+                                                            <option>Újszerű</option>
+                                                            <option>Felújított</option>
+                                                            <option>Jó állapotú</option>
+                                                            <option>Közepes állapotú</option>
+                                                            <option>Felújítandó</option>
+                                                            <option>Befejezetlen</option>
+                                                    </select>
+                                            </div>
 
-                                                        </div>
+                                        </div>
+
+                                        <div class="row mt-3">
+
+                                                <div class="form-group col">
+                                                    <label for="new-estate-roomcount">Szobák:</label>
+                                                    <input type="text" id="new-estate-roomcount" class="form-control" placeholder="darab"/>
+                                                </div>
+
+                                                <div class="form-group col">
+                                                    <label for="new-estate-kitchencount">Konyhák:</label>
+                                                    <input type="text" id="new-estate-kitchencount" class="form-control" placeholder="darab"/>
+                                                </div>
+
+                                                <div class="form-group col">
+                                                        <label for="new-estate-bathroomcount">Fürdőszobák:</label>
+                                                        <input type="text" id="new-estate-bathroomcount" class="form-control" placeholder="darab"/>
                                                 </div>
 
                                         </div>
-        
-                                </div>
-                        </div>
 
-                </div>
+                                        <div class="row mt-3">
+
+                                                <div class="form-group col">
+                                                    <label for="new-estate-floorcount">Szintek:</label>
+                                                    <input type="text" id="new-estate-floorcount" class="form-control" placeholder="darab"/>
+                                                </div>
+
+                                                <div class="form-group col">
+                                                    <label for="new-estate-propertysquarefeet">Telek:</label>
+                                                    <input type="text" id="new-estate-propertysquarefeet" class="form-control" placeholder="m^2"/>
+                                                </div>
+
+                                                <div class="form-group col">
+                                                    <label for="new-estate-garagesquarefeet">Garázs:</label>
+                                                    <input type="text" id="new-estate-garagesquarefeet" class="form-control" placeholder="m^2"/>
+                                                </div>
+
+                                        </div>
+
+                                        <div class="row mt-3">
+
+                                                <div class="form-group col">
+                                                    <label for="new-estate-gardensquarefeet">Kert:</label>
+                                                    <input type="text" id="new-estate-gardensquarefeet" class="form-control" placeholder="m^2"/>
+                                                </div>
+
+                                                <div class="form-group col">
+                                                    <label for="new-estate-terracesquarefeet">Terasz:</label>
+                                                    <input type="text" id="new-estate-terracesquarefeet" class="form-control" placeholder="m^2"/>
+                                                </div>
+
+                                                <div class="form-group col-sm-4">
+                                                    <label for="new-estate-roof">Tetőtér:</label>
+                                                    <select id="new-estate-roof" class="form-control">
+                                                            <option>Nem Tetőtéri</option>
+                                                            <option>Tetőtéri</option>
+                                                    </select>
+                                                </div>
+
+                                        </div>
+
+                                        <div class="row mt-3">
+
+                                            <div class="form-group col-sm-4">
+                                                <label for="new-estate-comfort">Komfort-Szint:</label>
+                                                <select id="new-estate-comfort" class="form-control">
+                                                        <option>Luxus</option>
+                                                        <option>Duplakomfortos</option>
+                                                        <option>Összkomfortos</option>
+                                                        <option>Komfortos</option>
+                                                        <option>Félkomfortos</option>
+                                                        <option>Komfort Nélküli</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="form-group col-sm-4">
+                                                <label for="new-estate-view">Kilátás:</label>
+                                                <select id="new-estate-view" class="form-control">
+                                                        <option>Tópartra</option>
+                                                        <option>Folyópartra</option>
+                                                        <option>Hegyvidékre</option>
+                                                        <option>Völgyre</option>
+                                                        <option>Utcára</option>
+                                                        <option>Városra</option>
+                                                        <option>Városrészre</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="form-group col-sm-4">
+                                                <label for="new-estate-area">Környék:</label>
+                                                <select id="new-estate-area" class="form-control">
+                                                        <option>Csendes</option>
+                                                        <option>Átlagos</option>
+                                                        <option>Mozgalmas</option>
+                                                </select>
+                                            </div>
+
+                                        </div>
+
+                                        <div>
+                                                <div class="col tags">
+                                                
+                                                        <h6 class="row mt-3">Általános Jellemzők:</h6>
+
+                                                        <span class="tag-elem tag p-2 m-1 hvr-grow" id="new-estate-hasgarage" value="false">Garázs</span>
+                                                        <span class="tag-elem tag p-2 m-1 hvr-grow" id="new-estate-haselevator" value="false">Lift</span>
+                                                        <span class="tag-elem tag p-2 m-1 hvr-grow" id="new-estate-hasgarden" value="false">Kert</span>
+                                                        <span class="tag-elem tag p-2 m-1 hvr-grow" id="new-estate-hasterrace" value="false">Terasz</span>
+                                                        <span class="tag-elem tag p-2 m-1 hvr-grow" id="new-estate-hasbasement" value="false">Pince</span>
+                                                        <span class="tag-elem tag p-2 m-1 hvr-grow" id="new-estate-disabilityfriendly" value="false">Akadálymentesített</span>
+                                                        <span class="tag-elem tag p-2 m-1 hvr-grow" id="new-estate-innerheightgreaterthan3meters" value="false">Belmagasság > 3m</span>
+                                                        <span class="tag-elem tag p-2 m-1 hvr-grow" id="new-estate-hasseparatebathandtoilet" value="false">Fürdő és WC Külön</span>
+                                                        <span class="tag-elem tag p-2 m-1 hvr-grow" id="new-estate-haspanelprogramparticipation" value="false">Panelprogramban Részt Vett</span>
+                                                        <span class="tag-elem tag p-2 m-1 hvr-grow" id="new-estate-hasheatisolation" value="false">Hőszigetelt</span>
+
+                                                        <h6 class="row mt-3">Fűtés Jellemzők:</h6>
+
+                                                        <span class="tag-elem tag p-2 m-1 hvr-grow" id="new-estate-hascirculation" value="false">Cirkós</span>
+                                                        <span class="tag-elem tag p-2 m-1 hvr-grow" id="new-estate-hasconvector" value="false">Konvektoros</span>
+                                                        <span class="tag-elem tag p-2 m-1 hvr-grow" id="new-estate-hasgasheating" value="false">Gázkazános</span>
+                                                        <span class="tag-elem tag p-2 m-1 hvr-grow" id="new-estate-hasnetworkedheating" value="false">Hálózati Fűtés</span>
+                                                        <span class="tag-elem tag p-2 m-1 hvr-grow" id="new-estate-haswoodenheating" value="false">Fatüzelésű</span>
+                                                        <span class="tag-elem tag p-2 m-1 hvr-grow" id="new-estate-hascombinedheating" value="false">Vegyes Tüzelésű</span>
+                                                        <span class="tag-elem tag p-2 m-1 hvr-grow" id="new-estate-hasremoteheating" value="false">Távfűtéses</span>
+                                                        <span class="tag-elem tag p-2 m-1 hvr-grow" id="new-estate-hasgasremote" value="false">Gázfűtéses</span>
+                                                        <span class="tag-elem tag p-2 m-1 hvr-grow" id="new-estate-haselectricityheating" value="false">Villamos Fűtésű</span>
+                                                        <span class="tag-elem tag p-2 m-1 hvr-grow" id="new-estate-hascockleheating" value="false">Cserépkályha</span>
+                                                        <span class="tag-elem tag p-2 m-1 hvr-grow" id="new-estate-haschimneyheating" value="false">Kandalló</span>
+                                                        <span class="tag-elem tag p-2 m-1 hvr-grow" id="new-estate-hasfloorheating" value="false">Padlófűtéses</span>
+                                                        <span class="tag-elem tag p-2 m-1 hvr-grow" id="new-estate-hasairconditioner" value="false">Légkondis</span>
+
+                                                        <h6 class="row mt-3">Villamosság:</h6>
+
+                                                        <span class="tag-elem tag p-2 m-1 hvr-grow" id="new-estate-hassuncollector" value="false">Napelemes</span>
+                                                        <span class="tag-elem tag p-2 m-1 hvr-grow" id="new-estate-networkedelectricity" value="false">Hálózati</span>
+                                                        <span class="tag-elem tag p-2 m-1 hvr-grow" id="new-estate-haspowerwall" value="false">Akkumulátoros</span>
+
+                                                        <h6 class="row mt-3">Szolgáltatások 500 méteres Körzeten belül:</h6>
+
+                                                        <span class="tag-elem tag p-2 m-1 hvr-grow" id="new-estate-hasgrocerynearby" value="false">Áruház </span>
+                                                        <span class="tag-elem tag p-2 m-1 hvr-grow" id="new-estate-haspetrolstationnearby" value="false">Benzinkút</span>
+                                                        <span class="tag-elem tag p-2 m-1 hvr-grow" id="new-estate-haspublictransportnearby" value="false">Tömegközlekedés</span>
+                                                        <span class="tag-elem tag p-2 m-1 hvr-grow" id="new-estate-hashaspharmacynearby" value="false">Gyógyszertár</span>
+                                                        <span class="tag-elem tag p-2 m-1 hvr-grow" id="new-estate-hasschoolnearby" value="false">Iskola</span>
+                                                        <span class="tag-elem tag p-2 m-1 hvr-grow" id="new-estate-hasentertainmentnearby" value="false">Szórakozási Lehetőség</span>
+                                                        <span class="tag-elem tag p-2 m-1 hvr-grow" id="new-estate-hasmaildepotnearby" value="false">Posta</span>
+                                                        <span class="tag-elem tag p-2 m-1 hvr-grow" id="new-estate-hasbanknearby" value="false">Bank</span>
+                                
+                                                </div>  
+                                        </div>
+
+                                        <div class="row mt-3">
+
+                                                <div class="form-group col">
+                                                    <label for="new-estate-country">Ország:</label>
+                                                    <input type="text" id="new-estate-country" class="form-control" placeholder="pld. Magyarország"/>
+                                                </div>
+
+                                                <div class="form-group col">
+                                                    <label for="new-estate-county">Megye:</label>
+                                                    <input type="text" id="new-estate-county" class="form-control" placeholder="pld. Pest"/>
+                                                </div>
+
+                                                <div class="form-group col-sm-4">
+                                                    <label for="new-estate-city">Város:</label>
+                                                    <input type="text" id="new-estate-city" class="form-control" placeholder="pld. Budapest"/>
+                                                </div>
+
+                                        </div>
+
+                                        <div class="row mt-3">
+
+                                                <div class="form-group col">
+                                                    <label for="new-estate-postcode">Irányítószám:</label>
+                                                    <input type="text" id="new-estate-postcode" class="form-control" placeholder="pld. 1105"/>
+                                                </div>
+
+                                                <div class="form-group col">
+                                                    <label for="new-estate-housenumber">Házszám:</label>
+                                                    <input type="text" id="new-estate-housenumber" class="form-control" placeholder="pld. 28"/>
+                                                </div>
+
+                                                <div class="form-group col-sm-4">
+                                                    <label for="new-estate-street">Utca:</label>
+                                                    <input type="text" id="new-estate-street" class="form-control" placeholder="pld. Andrássy Út"/>
+                                                </div>
+
+                                        </div>
+
+                                        <div class="row mt-3">
+
+                                                <div class="form-group col">
+                                                    <label for="new-estate-floor">Emelet:</label>
+                                                    <input type="text" id="new-estate-floor" class="form-control" placeholder="pld. 2"/>
+                                                </div>
+
+                                                <div class="form-group col">
+                                                    <label for="new-estate-door">Ajtó:</label>
+                                                    <input type="text" id="new-estate-door" class="form-control" placeholder="pld. 8"/>
+                                                </div>
+
+                                        </div>
+
+                                        <div class="row mt-3">
+
+                                                <div class="form-group col">
+                                                    <label for="new-estate-adtitle">Hirdetés Címe:</label>
+                                                    <input type="text" id="new-estate-adtitle" class="form-control" placeholder="leírás..."/>
+                                                </div>
+
+                                        </div>
+
+                                        <div class="row mt-3">
+
+                                                <div class="form-group col">
+                                                    <label for="new-estate-addescr">Hirdetés Szövege:</label>
+                                                    <textarea id="new-estate-addescr" class="form-control" placeholder="leírás..."></textarea>
+                                                </div>
+
+                                                <div class="form-group col-sm-4">
+                                                        <label for="new-estate-adtype">Hirdetés Típusa:</label>
+                                                        <select id="new-estate-adtype" class="form-control">
+                                                                <option>Eladó</option>
+                                                                <option>Kiadó</option>
+                                                        </select>
+                                                </div>
+
+                                                <div class="form-group col-sm-4">
+                                                    <label for="new-estate-priority">Prioritás:</label>
+                                                    <select id="new-estate-priority" class="form-control">
+                                                            <option value='3'>Normál</option>
+                                                            <option value='2'>Magas</option>
+                                                            <option value='1'>Kiemelt</option>
+                                                    </select>
+                                            </div>
+
+                                        </div>
+                                            
+                                </div>
+
+                            </div> <!-- tartalom -->
+
+                            <div class="modal-footer">
+
+                                    <div class="container">
+                                            <div class="row">
+                                                    
+                                                    <div class="alert alert-danger" role="alert">
+                                                        Figyelem! A hirdetés csak akkor jelenik meg, ha legalább 4 kép feltöltésre került.
+                                                        <br/>
+                                                        Amennyiben megfelelőnek találod a megadott adatokat, úgy kérlek kattints a Jóváhagyás gombra!
+                                                        <br/>
+                                                        <br/>
+                                                        <span class="font-weight-bold">
+                                                            Képeket belépett státuszú felhasználó felhasználó tud feltölteni a hirdetés adatlapján.
+                                                        </span>
+                                                    </div>
+
+                                                    <span class="col">
+
+                                                            <button id="cancel-upload-estate-btn" class="btn btn-danger float-left mr-3 hvr-grow" type="button">
     
+                                                                    <span class="fas fa-backspace"></span>
+                                                                    &nbsp;
+                                                                    Mégsem&nbsp;&nbsp;
+                                                                    
+                                                            </button>
+
+                                                    </span>
+                                                    <span class="col">
+
+                                                            <button id="upload-estate-btn"
+                                                                    type="button" 
+                                                                    class="btn btn-success hvr-grow float-right">
+                                                                    <span class="fas fa-save"></span>
+                                                                    &nbsp;
+                                                                    Jóváhagyás
+                                                            </button>
+                                                    </span>
+
+                                            </div>
+                                    </div>
+
+                            </div>
+
+                    </div>
             </div>
-        
+
     </div>
 
 </div>

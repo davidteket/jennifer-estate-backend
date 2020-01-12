@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace backend.DataAccess.Entities
+namespace DunakanyarHouseIngatlan.DataAccess.Entities
 {
     public class EstateClient
     {

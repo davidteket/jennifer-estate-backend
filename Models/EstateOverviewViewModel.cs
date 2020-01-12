@@ -1,4 +1,4 @@
-namespace backend.Models
+namespace DunakanyarHouseIngatlan.Models
 {
     public class EstateOverviewViewModel
     {

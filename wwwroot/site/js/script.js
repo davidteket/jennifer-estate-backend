@@ -77,6 +77,44 @@ window.onload = function () {
                     $("#ad-description").append(response.Advertisement.DescriptionDetail);
                     $('#estate-detailsheet').hide();
 
+                    // OpenStreetMap lekérdezés és térképbeállítás.
+                    //
+                    var osmQuery = "https://nominatim.openstreetmap.org/search?";
+
+                    var location = "street=" + response.Address.HouseNumber + " " + response.Address.Street + "&" +
+                                   "city=" + response.Address.City + "&" +
+                                   "county=" + response.Address.County + "&" +
+                                   "country=" + response.Address.Country + "&" +
+                                   "postalcode=" + response.Address.PostCode + "&format=json";
+
+                    osmQuery += location;
+                    $.getJSON(osmQuery, null, function(response) {
+
+                        if (response.length == 0) 
+                            $('#openstreetmap-embedded').hide();
+                        else {
+                            var map = 'https://www.openstreetmap.org/export/embed.html?';
+
+                            var x1 = response[0]["boundingbox"][2];
+                            var x2 = response[0]["boundingbox"][3];
+                            var y1 = response[0]["boundingbox"][0];
+                            var y2 = response[0]["boundingbox"][1];
+
+                            var space = '%2C';
+                            var amp = '&amp;';
+
+                            var boundingBox = 'bbox=' + x1 + space + y1  + space + x2 + space + y2;
+                            var marker = 'marker=' + response[0]["lat"] + space + response[0]["lon"];
+
+                            map += boundingBox + amp + marker + "&layers=ND";
+
+                            $('#openstreetmap-embedded').attr('src', map);
+                        }
+
+                    });
+                    
+                    //$("#openstreetmap-embedded").attr('src', osmEmbed);
+
                     // Authorizált.
                     //
                     if (response.Images.length < 4 || response.Images.length == 0) {
@@ -148,7 +186,7 @@ window.onload = function () {
                         ProfilePictureId: "default/no-image.jpg"    <-- TODO
                         */
 
-                        $('#logged-in-user-fullname').text((response.ApproachType == null ? "" : response.ApproachType) + " " + response.LastName + " " + response.FirstName);
+                        $('#logged-in-user-fullname').text(response.LastName + " " + response.FirstName);
                         $('#user-profile-username').text(response.UserName);
                         $('#user-profile-adcount').text(response.AdvertisementCount);
                         var roles = "";
@@ -182,6 +220,7 @@ window.onload = function () {
             $("#upload-estate-images-btn").hide();
             $("#edit-estate-btn").hide();
             $("#delete-estate-btn").hide();
+            $("#delete-gallery-item").hide();
         }
     });
 };
@@ -237,13 +276,14 @@ function loadEstates() {
 
     $("#contents").append($("<div>").load("/estates.html", null, function() {
 
+        if ($(".home").length)
+            $("#search-btn-container").hide();
+
         $("#estate-lister").load("site/shared/estate_lister.html", null, function() {
 
             // Ingatlanok lekérése és listázása:
             //
-            $.getJSON("/Estate/GetEstates", null, function(estates) {
-                
-                //estates = newestDate(estates);
+            $.getJSON("/Estate/Load", null, function(estates) {
 
                 if (getUrlVars()["orderBy"] == "expensiveFirst") {
                     estates = highestPrice(estates);
@@ -254,15 +294,21 @@ function loadEstates() {
                     cheapest();
                 }
                 if (getUrlVars()["orderBy"] == "oldestFirst") {
-                    estates = oldestDate(estates);
+                    estates = newestDate(estates);
                     oldest();
                 }
                 if (getUrlVars()["orderBy"] == "newestFirst") {
-                    estates = newestDate(estates);
+                    estates = oldestDate(estates);
                     newest();
                 }
 
                 var row = $("#estates");
+                if (estates.length == 0) {
+                    $("#no-estates-to-display").show(1000);
+                    return;
+                }
+                else 
+                    $("#no-estates-to-display").hide();
 
                 for(var i = 0; i < estates.length; ++i) 
                 {
@@ -323,22 +369,18 @@ $(document).on('click', '#back-to-simple-search-btn', function() {
 
 // Tag klikkelve.
 //
-$(document).on('click', '.tag', function(elem) 
-{
-    var item = $(elem.target);
+$('.tag-elem').click(function() {
 
-    if (item.hasClass('tag-clicked')) {
+    var toggler = +$(this).val();
+    
+    if (toggler == 1)
+        $(this).attr('value', false);
+    else 
+        $(this).attr('value', true);
 
-        item.removeClass('tag-clicked');
-        item.attr('value', 0);
-
-    }
-    else {
-
-        item.addClass('tag-clicked');
-        item.attr('value', 1);
-    }
-});
+    $(this).toggleClass('tag-clicked');
+    return false;
+})
 
 // Bejelentkezés.
 //
@@ -417,93 +459,111 @@ $(document).on('click', '#upload-estate-btn', function() {
 
                     Id : 0,
                     Price : +$("#new-estate-price").val(),
-                    SquareFeet : +$("#new-estate-squarefeet").val(),
-                    Category : $("#new-estate-category").val(),
-                    BuiltAt : $("#new-estate-builtat").val() + '-01-01',
-                    RefurbishedAt : $("#new-estate-refurbishedat").val() + '-01-01',
-                    Grade : $("#new-estate-quality").val(),
-                    Room : +$("#new-estate-roomcount").val(),
-                    Kitchen : +$("#new-estate-kitchencount").val(),
-                    Bathroom : +$("#new-estate-bathroomcount").val(),
+                    TotalSquareFeet : +$("#new-estate-squarefeet").val(),
+                    LandSquareFeet : +$("#new-estate-propertysquarefeet").val(),
+                    RoomCount : +$("#new-estate-roomcount").val(),
+                    KitchenCount : +$("#new-estate-kitchencount").val(),
+                    BathroomCount : +$("#new-estate-bathroomcount").val(),
                     FloorCount : +$("#new-estate-floorcount").val(),
-                    Garage : +$("#new-estate-hasgarage").attr('value'),
-                    Elevator : +$("#new-estate-haselevator").attr('value'),
-                    Garden : +$("#new-estate-hasgarden").attr('value'),
-                    Terace : +$("#new-estate-hasterrace").attr('value'),
-                    PropertySquareFeet : +$("#new-estate-propertysquarefeet").val(),
                     GarageSquareFeet : +$("#new-estate-garagesquarefeet").val(),
                     GardenSquareFeet : +$("#new-estate-gardensquarefeet").val(),
                     TerraceSquareFeet : +$("#new-estate-terracesquarefeet").val(),
-                    Basement : +$("#new-estate-hasbasement").attr('value'),
-                    Comfort : +$("#new-estate-hascomfort").attr('value'),
+                    
+                    BuiltAt : $("#new-estate-builtat").val() + '-01-01',
+                    RefurbishedAt : $("#new-estate-refurbishedat").val() + '-01-01',    // TODO
+
+                    HasElevator : $("#new-estate-haselevator").attr('value'),
+                    HasGarden : $("#new-estate-hasgarden").attr('value'),
+                    HasGarage : $("#new-estate-hasgarage").attr('value'),
+                    HasDisabledFriendly : $("#new-estate-disabilityfriendly").attr('value'),
+                    HasInnerHeightGreatherThan3Meters : $("#new-estate-innerheightgreaterthan3meters").attr('value'),
+                    HasSeparateWcAndBathroom : $("#new-estate-hasseparatebathandtoilet").attr('value'),
+                    HasParticipatedInThePanelProgram : $("#new-estate-haspanelprogramparticipation").attr('value'),
+                    HasHeatIsolated : $("#new-estate-hasheatisolation").attr('value'),
+                    HasTerace : $("#new-estate-hasterrace").attr('value'),
+                    HasBasement : $("#new-estate-hasbasement").attr('value'),
+
+                    Roof : $("#new-estate-roof").val(),
+                    Comfort : $("#new-estate-comfort").val(),
+                    Outlook : $("#new-estate-view").val(),
+                    Area : $("#new-estate-area").val(),
+                    Quality : $("#new-estate-quality").val(),
+                    Category : $("#new-estate-category").val(),
                     AdvertiserId : advertiserId
                 },
         
                 Address : {
 
                     Id : 0,
+                    FloorNumber : $("#new-estate-floorcount").val(),
+                    EstateId : 0,
+                    
                     Country : $("#new-estate-country").val(),
                     County : $("#new-estate-county").val(),
                     City : $("#new-estate-city").val(),
                     PostCode : $("#new-estate-postcode").val(),
                     Street : $("#new-estate-street").val(),
                     HouseNumber : $("#new-estate-housenumber").val(),
-                    Door : $("#new-estate-door").val(),
-                    FloorNumber : +$("#new-estate-floor").val(),
-                    EstateId : 0
+                    Door : $("#new-estate-door").val()
                 },
         
                 Electricity : {
 
                     Id : 0,
-                    SunCollector : +$("#new-estate-hassuncollector").attr('value'),
-                    Thermal : 0,
-                    Networked : 1,
-                    EstateId : 0
+                    EstateId : 0,
+                    
+                    SunCollector : $("#new-estate-hassuncollector").attr('value'),
+                    PowerWall : $("#new-estate-haspowerwall").attr('value'),
+                    Networked : $("#new-estate-networkedelectricity").attr('value'),
                 },
         
                 Heating : {
 
-                    Id : 0,
-                    ByWood : +$("#new-estate-haswoodenheating").attr('value'),
-                    ByRemote : +$("#new-estate-hasremoteheating").attr('value'),
-                    ByGas : +$("#new-estate-hasgasheating").attr('value'),
-                    ByElectricity : +$("#new-estate-haselectricityheating").attr('value'),
-                    FloorHeating : +$("#new-estate-hasfloorheating").attr('value'),
-                    EstateId : 0 
+                    Id : 0,       
+                    EstateId : 0,
+
+                    ByCirculation : $("#new-estate-hascirculation").attr('value'),
+                    ByGasConvector : $("#new-estate-hasconvector").attr('value'),
+                    ByGas : $("#new-estate-hasgasheating").attr('value'),
+                    ByWood : $("#new-estate-haswoodenheating").attr('value'),
+                    ByCombined : $("#new-estate-hascombinedheating").attr('value'),
+                    ByChimney : $("#new-estate-haschimneyheating").attr('value'),
+                    ByCockle : $("#new-estate-hascockleheating").attr('value'),
+                    ByRemote : $("#new-estate-hasremoteheating").attr('value'),
+                    ByNetworked : $("#new-estate-hasgasremote").attr('value'),
+                    ByElectricity : $("#new-estate-haselectricityheating").attr('value'),
+                    ByFloorHeating : $("#new-estate-hasfloorheating").attr('value')
+                    
                 },
         
                 PublicService : {
 
                     Id : 0,
-                    Grocery : +$("#new-estate-hasgrocerynearby").attr('value'),
-                    GasStation : +$("#new-estate-haspetrolstationnearby").attr('value'),
-                    Transport : +$("#new-estate-haspublictransportnearby").attr('value'),
-                    DrugStore : +$("#new-estate-hashaspharmacynearby").attr('value'),
-                    School : +$("#new-estate-hasschoolnearby").attr('value'),
-                    MailDepot : +$("#new-estate-hasmaildepotnearby").attr('value'),
-                    Bank : +$("#new-estate-hasbanknearby").attr('value'),
-                    EstateId : 0 
-                },
-        
-                Water : {
-
-                    Id : 0,
-                    AvailabilityType : "Csatornázott",
-                    EstateId : 0
+                    EstateId : 0,
+                    
+                    HasGroceryNearby : $("#new-estate-hasgrocerynearby").attr('value'),
+                    HasGasStationNearby : $("#new-estate-haspetrolstationnearby").attr('value'),
+                    HasTransportNearby : $("#new-estate-haspublictransportnearby").attr('value'),
+                    HasDrugStoreNearby : $("#new-estate-hashaspharmacynearby").attr('value'),
+                    HasSchoolNearby : $("#new-estate-hasschoolnearby").attr('value'),
+                    HasMailDepotNearby : $("#new-estate-hasmaildepotnearby").attr('value'),
+                    HasBankNearby : $("#new-estate-hasbanknearby").attr('value'),
+                    HasEntertainmentServicesNearby : $("#new-estate-hasentertainmentnearby").attr('value')
                 },
         
                 Advertisement : {
 
                     Id : 0,
-                    TimePosted : creationTime.getFullYear() + '-' + creationTime.getMonth() + '-' + creationTime.getDate(),
+                    OrderOfAppearance : +$('#new-estate-priority').val(),
+                    EstateId : 0,
+                    
+                    TimePosted : creationTime.getFullYear() + '-' + creationTime.getMonth() + '-' + creationTime.getDay(),
+                    LastModification : null,
+
                     Title : $("#new-estate-adtitle").val(),
                     DescriptionDetail : $("#new-estate-addescr").val(),
-                    LastModification : null,
-                    OrderOfAppearance : null,
                     OfferType : $("#new-estate-adtype").val(),
-                    EstateId : 0,
-                    AdvertiserId : advertiserId 
+                    AdvertiserId : advertiserId
                 } 
             };
         
@@ -600,11 +660,11 @@ $(document).on('drop', '#image-upload-dropzone', function(elem) {
     for (var i = 0; i < $("#image-input-elem")[0].files.length; ++i) 
     {        
         $("#awaiting-for-upload-images-container")
-            .append($("<div class='row'>")
-            .append($("<div class='col'>")
-            .append($("<h5 class='text-center badge-secondary text-light rounded p-2'>")
-            .append($("<span class='fa fa-arrow-alt-circle-up'>")
-            .append('&nbsp;' + $("#image-input-elem")[0].files[i].name)))));        
+            .append($("<div id=" + $("#image-input-elem")[0].files[i].name.replace('.', '-')  + " class='col-sm-12 badge-warning'>")
+            .append($("<div>")
+            .append($("<div class='p-1'>")
+            .append($("<span id=" + $("#image-input-elem")[0].files[i].name.replace('.', '-') + "-status" + " class='spinner-border spinner-border-sm' role='status' aria-hidden='true'>"))
+            .append($("<span class='pl-3'>").text($("#image-input-elem")[0].files[i].name)))));        
     }
 
     // Fájlok feltöltése és listázása a feltöltöttek sorában.
@@ -642,9 +702,33 @@ $(document).on('drop', '#image-upload-dropzone', function(elem) {
                     success : function(response) {
 
                         var result = JSON.parse(response);
-                        if (result.ItemId != null)
-                            console.log('uploaded...');
-
+                        
+                        if (result.ItemId != null) 
+                        {
+                            for (var i = 0; i < $("#image-input-elem")[0].files.length; ++i)  {
+                                
+                                var uploaded = "";
+                                var images = JSON.parse(result.Message);
+                                for (var j = 0; j < images.length; ++j) {
+                                    if (images[j].replace('.', '-') == $("#image-input-elem")[0].files[i].name.replace('.', '-'))
+                                    {
+                                        if (images[j].replace('.', '-') == $("#image-input-elem")[0].files[i].name.replace('.', '-')) 
+                                        {
+                                            $("#" + $("#image-input-elem")[0].files[i].name.replace('.', '-')).removeClass("badge-warning");
+                                            $("#" + $("#image-input-elem")[0].files[i].name.replace('.', '-')).addClass("badge-success");
+                                            $("#" + images[j].replace('.', '-') + "-status").removeClass("spinner-border spinner-border-sm");
+                                            $("#" + images[j].replace('.', '-') + "-status").addClass('fa fa-check-circle');
+                                        }
+                                        else {
+                                            $("#" + $("#image-input-elem")[0].files[i].name.replace('.', '-')).removeClass("badge-warning");
+                                            $("#" + $("#image-input-elem")[0].files[i].name.replace('.', '-')).addClass("badge-danger");
+                                            $("#" + images[j].replace('.', '-') + "-status").removeClass("spinner-border spinner-border-sm");
+                                            $("#" + images[j].replace('.', '-') + "-status").addClass('fa fa-exclamation-triangle');
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             );
@@ -656,8 +740,91 @@ $(document).on('drop', '#image-upload-dropzone', function(elem) {
 //
 $(document).on('click', '#image-upload-dropzone', function() {
 
-    // TODO
+    $('#image-input-elem').click();
 
+});
+
+$(document).on('change', '#image-input-elem', function() {
+    
+    $("#awaiting-for-upload-images-container")
+            .append($("<div id=" + $("#image-input-elem")[0].files[0].name.replace('.', '-')  + " class='col-sm-12 badge-warning'>")
+            .append($("<div>")
+            .append($("<div class='p-1'>")
+            .append($("<span id=" + $("#image-input-elem")[0].files[0].name.replace('.', '-') + "-status" + " class='spinner-border spinner-border-sm' role='status' aria-hidden='true'>"))
+            .append($("<span class='pl-3'>").text($("#image-input-elem")[0].files[0].name)))));
+
+    var data = $("#image-form")[0];
+    var formData = new FormData(data);
+
+    $.getJSON('/Employee/GetCurrentUserId', null, function(response) {
+
+        var result = response;
+
+        if (result.ItemId != null) 
+        {
+            var item = getUrlVars("estateId");
+
+            var imageData = {
+        
+                UserId : result.ItemId,
+                EstateId : item.estateId,
+                Category : "",
+                Title : "",
+                DescriptionDetail : ""
+            };
+
+            formData.append('imageData', JSON.stringify(imageData));
+
+            $.ajax(
+                {
+                    url : '/Estate/ImageUpload', 
+                    type : 'POST',
+                    data : formData,
+                    processData: false,
+                    contentType: false,
+
+                    success : function(response) {
+
+                        var result = JSON.parse(response);
+                        if (result.ItemId != null)
+                        {
+                            for (var i = 0; i < $("#image-input-elem")[0].files.length; ++i)  {
+                                
+                                var uploaded = "";
+                                var images = JSON.parse(result.Message);
+                                for (var j = 0; j < images.length; ++j) {
+                                    if (images[j].replace('.', '-') == $("#image-input-elem")[0].files[i].name.replace('.', '-'))
+                                    {
+                                        if (images[j].replace('.', '-') == $("#image-input-elem")[0].files[i].name.replace('.', '-')) 
+                                        {
+                                            $("#" + $("#image-input-elem")[0].files[i].name.replace('.', '-')).removeClass("badge-warning");
+                                            $("#" + $("#image-input-elem")[0].files[i].name.replace('.', '-')).addClass("badge-success");
+                                            $("#" + images[j].replace('.', '-') + "-status").removeClass("spinner-border spinner-border-sm");
+                                            $("#" + images[j].replace('.', '-') + "-status").addClass('fa fa-check-circle');
+                                        }
+                                        else {
+                                            $("#" + $("#image-input-elem")[0].files[i].name.replace('.', '-')).removeClass("badge-warning");
+                                            $("#" + $("#image-input-elem")[0].files[i].name.replace('.', '-')).addClass("badge-danger");
+                                            $("#" + images[j].replace('.', '-') + "-status").removeClass("spinner-border spinner-border-sm");
+                                            $("#" + images[j].replace('.', '-') + "-status").addClass('fa fa-exclamation-triangle');
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+                }
+            );
+        }
+    });
+
+});
+
+// Képfeltöltés befejezése.
+//
+$(document).on('click', '#finish-img-upload-btn', function() {
+    window.location.reload();
 });
 
 // Ingatlanok gomb.
@@ -678,6 +845,33 @@ $(document).on('click', '#show-estate-detailsheet-btn', function() {
         $('#show-estate-detailsheet-btn').text('Adatlap Megtekintése');
     }
     else {
+        var id = getUrlVars()["estateId"];
+        $.getJSON('/Estate/Detail/?estateId=' + id, null, function(response) {
+
+            $('#estate-detailsheet-price').text(response.Estate.Price + " HUF");
+            $('#estate-detailsheet-area').text(response.Estate.TotalSquareFeet + " négyzetméter");
+            $('#estate-detailsheet-category').text(response.Estate.Category);
+            $('#estate-detailsheet-builtat').text(response.Estate.BuiltAt.split('-')[0]);
+            $('#estate-detailsheet-refurbishedat').text(response.Estate.RefurbishedAt.split('-')[0]);
+
+            $('#estate-detailsheet-quality').text(response.Estate.Quality);
+            $('#estate-detailsheet-roomcount').text(response.Estate.RoomCount + " darab");
+            $('#estate-detailsheet-kitchencount').text(response.Estate.KitchenCount + " darab");
+            $('#estate-detailsheet-bathcount').text(response.Estate.BathroomCount + " darab");
+            $('#estate-detailsheet-floorcount').text(response.Estate.FloorCount + " darab");
+
+            $('#estate-detailsheet-landarea').text(response.Estate.LandSquareFeet + " négyzetméter");
+            $('#estate-detailsheet-garagearea').text(response.Estate.GardenSquareFeet + " négyzetméter");
+            $('#estate-detailsheet-gardenarea').text(response.Estate.GarageSquareFeet + " négyzetméter");
+            $('#estate-detailsheet-teracearea').text(response.Estate.TerraceSquareFeet + " négyzetméter");
+            $('#estate-detailsheet-roof').text(response.Estate.Roof);
+
+            $('#estate-detailsheet-comfort').text(response.Estate.Comfort);
+            $('#estate-detailsheet-outlook').text(response.Estate.Outlook);
+            $('#estate-detailsheet-neighboor').text(response.Estate.Area);
+
+        });
+
         $('#estate-detailsheet').show(1000);
         $('#show-estate-detailsheet-btn').text('Adatlap Elrejtése');
     }
@@ -697,110 +891,149 @@ $(document).on('click', '#edit-estate-btn', function() {
         if (result != null)
         {
             $("#edit-estate-price").val(result.Estate.Price);
-            $("#edit-estate-squarefeet").val(result.Estate.SquareFeet);
+            $("#edit-estate-squarefeet").val(result.Estate.TotalSquareFeet);
             $("#edit-estate-category").val(result.Estate.Category);
-            $("#edit-estate-builtat").val(result.Estate.BuiltAt.split('-')[0]);
-            $("#edit-estate-refurbishedat").val(result.Estate.RefurbishedAt.split('-')[0]);
-            $("#edit-estate-quality").val(result.Estate.Grade);
-            $("#edit-estate-roomcount").val(result.Estate.Room);
-            $("#edit-estate-kitchencount").val(result.Estate.Kitchen);
-            $("#edit-estate-bathroomcount").val(result.Estate.Bathroom);
+            $("#edit-estate-builtat").val(result.Estate.BuiltAt);
+            $("#edit-estate-refurbishedat").val(result.Estate.RefurbishedAt);
+            $("#edit-estate-quality").val(result.Estate.Quality);
+            $("#edit-estate-roomcount").val(result.Estate.RoomCount);
+            $("#edit-estate-kitchencount").val(result.Estate.KitchenCount);
+            $("#edit-estate-bathroomcount").val(result.Estate.BathroomCount);
             $("#edit-estate-floorcount").val(result.Estate.FloorCount);
-            $("#edit-estate-propertysquarefeet").val(result.Estate.PropertySquareFeet);
+            $("#edit-estate-propertysquarefeet").val(result.Estate.LandSquareFeet);
             $("#edit-estate-garagesquarefeet").val(result.Estate.GarageSquareFeet);
-            $("#edit-estate-gardensquarefeet").val(result.Estate.GarageSquareFeet);
+            $("#edit-estate-gardensquarefeet").val(result.Estate.GardenSquareFeet);
             $("#edit-estate-terracesquarefeet").val(result.Estate.TerraceSquareFeet);
-            $("#edit-estate-hasgarage").attr('value', result.Estate.Garage);
-            if (result.Estate.Garage)
-                $("#edit-estate-hasgarage").addClass('tag-clicked');
+            $("#edit-estate-roof").val(result.Estate.Roof);
+            $("#edit-estate-comfort").val(result.Estate.Comfort);
+            $("#edit-estate-view").val(result.Estate.Outlook);
+            $("#edit-estate-area").val(result.Estate.Area);
 
-            $("#edit-estate-haselevator").attr('value', result.Estate.Elevator);
-            if (result.Estate.Elevator)
-                $("#edit-estate-haselevator").addClass('tag-clicked');
+            $("#edit-estate-hasgarage").attr('value', result.Estate.HasGarage);
+            $("#edit-estate-haselevator").attr('value', result.Estate.HasElevator);
+            $("#edit-estate-hasgarden").attr('value', result.Estate.HasGarden);
 
-            $("#edit-estate-hasgarden").attr('value', result.Estate.Garden);
-            if (result.Estate.Garden)
-                $("#edit-estate-hasgarden").addClass('tag-clicked');
+            $("#edit-estate-hasterrace").attr('value', result.Estate.HasTerace);
+            $("#edit-estate-hasbasement").attr('value', result.Estate.HasBasement);
+            $("#edit-estate-disabilityfriendly").attr('value', result.Estate.HasDisabledFriendly);
 
-            $("#edit-estate-hasterrace").attr('value', result.Estate.Terace);
-            if (result.Estate.Terace)
-                $("#edit-estate-hasterrace").addClass('tag-clicked');
+            $("#edit-estate-innerheightgreaterthan3meters").attr('value', result.Estate.HasInnerHeightGreatherThan3Meters);
+            $("#edit-estate-hasseparatebathandtoilet").attr('value', result.Estate.HasSeparateWcAndBathroom);
+            $("#edit-estate-haspanelprogramparticipation").attr('value', result.Estate.HasParticipatedInThePanelProgram);
 
-            $("#edit-estate-hasbasement").attr('value', result.Estate.Basement);
-            if (result.Estate.Terace)
-                $("#edit-estate-hasbasement").addClass('tag-clicked');
-
-            $("#edit-estate-hascomfort").attr('value', result.Estate.Comfort);
-            if (result.Estate.Comfort)
-                $("#edit-estate-hascomfort").addClass('tag-clicked');
-
-            $("#edit-estate-hassuncollector").attr('value', result.Electricity.SunCollector);
-            if (result.Electricity.SunCollector)
-                $("#edit-estate-hassuncollector").addClass('tag-clicked');
-
-            $("#edit-estate-hasnetworkedheating").attr('value', result.Electricity.Networked);
-            if (result.Electricity.Networked)
-                $("#edit-estate-hasnetworkedheating").addClass('tag-clicked');
-
-            $("#edit-estate-haswoodenheating").attr('value', result.Heating.ByWood);
-            if (result.Heating.ByWood)
-                $("#edit-estate-haswoodenheating").addClass('tag-clicked');
-
-            $("#edit-estate-hasremoteheating").attr('value', result.Heating.ByRemote);
-            if (result.Heating.ByRemote)
-                $("#edit-estate-hasremoteheating").addClass('tag-clicked');
+            $("#edit-estate-hasheatisolation").attr('value', result.Estate.HasHeatIsolated);
+            $("#edit-estate-hascirculation").attr('value', result.Heating.ByCirculation);
+            $("#edit-estate-hasconvector").attr('value', result.Heating.ByGasConvector);
 
             $("#edit-estate-hasgasheating").attr('value', result.Heating.ByGas);
-            if (result.Heating.ByGas)
-                $("#edit-estate-hasgasheating").addClass('tag-clicked');
+            $("#edit-estate-hasnetworkedheating").attr('value', result.Heating.ByNetworked);
+            $("#edit-estate-haswoodenheating").attr('value', result.Heating.ByWood);
+
+            $("#edit-estate-hascombinedheating").attr('value', result.Heating.ByCombined);
+            $("#edit-estate-hasremoteheating").attr('value', result.Heating.ByRemote);
+            $("#edit-estate-hasgasremote").attr('value', result.Heating.ByRemote);
 
             $("#edit-estate-haselectricityheating").attr('value', result.Heating.ByElectricity);
-            if (result.Heating.ByElectricity)
-                $("#edit-estate-haselectricityheating").addClass('tag-clicked');
+            $("#edit-estate-hascockleheating").attr('value', result.Heating.ByCockle);
+            $("#edit-estate-haschimneyheating").attr('value', result.Heating.ByChimney);
 
             $("#edit-estate-hasfloorheating").attr('value', result.Heating.FloorHeating);
-            if (result.Heating.FloorHeating)
-                $("#edit-estate-hasfloorheating").addClass('tag-clicked');
+            //$("#edit-estate-hasairconditioner").attr('value', result.Heating.
+            $("#edit-estate-hassuncollector").attr('value', result.Electricity.SunCollector);
+            $("#edit-estate-networkedelectricity").attr('value', result.Electricity.Networked);
 
-            $("#edit-estate-hasgrocerynearby").attr('value', result.Services.Grocery);
-            if (result.Services.Grocery)
-                $("#edit-estate-hasgrocerynearby").addClass('tag-clicked');
+            $("#edit-estate-haspowerwall").attr('value', result.Electricity.PowerWall);
+            $("#edit-estate-hasgrocerynearby").attr('value', result.Services.HasGroceryNearby);
+            $("#edit-estate-haspetrolstationnearby").attr('value', result.Services.HasGasStationNearby);
 
-            $("#edit-estate-haspetrolstationnearby").attr('value', result.Services.GasStation);
-            if (result.Services.GasStation)
-                $("#edit-estate-haspetrolstationnearby").addClass('tag-clicked');
-                
-            $("#edit-estate-haspublictransportnearby").attr('value', result.Services.Transport);
-            if (result.Services.Transport)
-                $("#edit-estate-haspublictransportnearby").addClass('tag-clicked');
+            $("#edit-estate-haspublictransportnearby").attr('value', result.Services.HasTransportNearby);
+            $("#edit-estate-hashaspharmacynearby").attr('value', result.Services.HasDrugStoreNearby);
+            $("#edit-estate-hasschoolnearby").attr('value', result.Services.HasSchoolNearby);
 
-            $("#edit-estate-hashaspharmacynearby").attr('value', result.Services.DrugStore);
-            if (result.Services.DrugStore)
-                $("#edit-estate-hashaspharmacynearby").addClass('tag-clicked');
-
-            $("#edit-estate-hasschoolnearby").attr('value', result.Services.School);
-            if (result.Services.School)
-                $("#edit-estate-hasschoolnearby").addClass('tag-clicked');
-
-            $("#edit-estate-hasmaildepotnearby").attr('value', result.Services.MailDepot);
-            if (result.Services.MailDepot)
-                $("#edit-estate-hasmaildepotnearby").addClass('tag-clicked');
-            
-            $("#edit-estate-hasbanknearby").attr('value', result.Services.Bank);
-            if (result.Services.Bank)
-                $("#edit-estate-hasbanknearby").addClass('tag-clicked');
+            $("#edit-estate-hasentertainmentnearby").attr('value', result.Services.HasEntertainmentServicesNearby);
+            $("#edit-estate-hasmaildepotnearby").attr('value', result.Services.HasMailDepotNearby);
+            $("#edit-estate-hasbanknearby").attr('value', result.Services.HasBankNearby);
 
             $("#edit-estate-country").val(result.Address.Country);
             $("#edit-estate-county").val(result.Address.County);
             $("#edit-estate-city").val(result.Address.City);
             $("#edit-estate-postcode").val(result.Address.PostCode);
-            $("#edit-estate-street").val(result.Address.Street);
             $("#edit-estate-housenumber").val(result.Address.HouseNumber);
+            $("#edit-estate-street").val(result.Address.Street);
             $("#edit-estate-floor").val(result.Address.FloorNumber);
             $("#edit-estate-door").val(result.Address.Door);
             $("#edit-estate-adtitle").val(result.Advertisement.Title);
-            $("#edit-estate-adtype").val(result.Advertisement.OfferType);
             $("#edit-estate-addescr").val(result.Advertisement.DescriptionDetail);
+            $("#edit-estate-adtype").val(result.Advertisement.OfferType);
+            $("#edit-estate-priority").val(result.Advertisement.OrderOfAppearance);
+
+            
+            if (result.Estate.HasGarage)
+                $("#edit-estate-hasgarage").addClass('tag-clicked');
+            if (result.Estate.HasElevator)
+                $("#edit-estate-haselevator").addClass('tag-clicked');
+            if (result.Estate.HasGarden)
+                $("#edit-estate-hasgarden").addClass('tag-clicked');                
+            if (result.Estate.HasTerace)
+                $("#edit-estate-hasterrace").addClass('tag-clicked');
+            if (result.Estate.HasBasement)
+                $("#edit-estate-hasbasement").addClass('tag-clicked');
+            if (result.Estate.HasDisabledFriendly)
+                $("#edit-estate-disabilityfriendly").addClass('tag-clicked');
+            if (result.Estate.HasInnerHeightGreatherThan3Meters)
+                $("#edit-estate-innerheightgreaterthan3meters").addClass('tag-clicked');
+            if (result.Estate.HasSeparateWcAndBathroom)
+                $("#edit-estate-hasseparatebathandtoilet").addClass('tag-clicked');
+            if (result.Estate.HasParticipatedInThePanelProgram)
+                $("#edit-estate-haspanelprogramparticipation").addClass('tag-clicked');                
+            if (result.Heating.HasHeatIsolated)
+                $("#edit-estate-hasheatisolation").addClass('tag-clicked');
+            if (result.Heating.ByCirculation)
+                $("#edit-estate-hascirculation").addClass('tag-clicked');
+            if (result.Heating.ByGasConvector)
+                $("#edit-estate-hasconvector").addClass('tag-clicked');
+            if (result.Heating.ByGas)
+                $("#edit-estate-hasgasheating").addClass('tag-clicked');
+            if (result.Heating.ByNetworked)
+                $("#edit-estate-hasnetworkedheating").addClass('tag-clicked');
+            if (result.Heating.ByWood)
+                $("#edit-estate-haswoodenheating").addClass('tag-clicked');                
+            if (result.Heating.ByCombined)
+                $("#edit-estate-hascombinedheating").addClass('tag-clicked');
+            if (result.Heating.ByRemote)
+                $("#edit-estate-hasremoteheating").addClass('tag-clicked');
+            if (result.Heating.ByRemote)
+                $("#edit-estate-hasgasremote").addClass('tag-clicked');
+            if (result.Heating.ByElectricity)
+                $("#edit-estate-haselectricityheating").addClass('tag-clicked');
+            if (result.Heating.ByCockle)
+                $("#edit-estate-hascockleheating").addClass('tag-clicked');
+            if (result.Heating.ByChimney)
+                $("#edit-estate-haschimneyheating").addClass('tag-clicked');                
+            if (result.Heating.ByFloorHeating)
+                $("#edit-estate-hasfloorheating").addClass('tag-clicked');
+            if (result.Electricity.SunCollector)
+                $("#edit-estate-hassuncollector").addClass('tag-clicked');
+            if (result.Electricity.Networked)
+                $("#edit-estate-networkedelectricity").addClass('tag-clicked');
+            if (result.Electricity.PowerWall)
+                $("#edit-estate-haspowerwall").addClass('tag-clicked');
+            if (result.Services.HasGroceryNearby)
+                $("#edit-estate-hasgrocerynearby").addClass('tag-clicked');                
+            if (result.Services.HasGasStationNearby)
+                $("#edit-estate-haspetrolstationnearby").addClass('tag-clicked');
+            if (result.Services.HasTransportNearby)
+                $("#edit-estate-haspublictransportnearby").addClass('tag-clicked');
+            if (result.Services.HasDrugStoreNearby)
+                $("#edit-estate-hashaspharmacynearby").addClass('tag-clicked');
+            if (result.Services.HasSchoolNearby)
+                $("#edit-estate-hasschoolnearby").addClass('tag-clicked');
+            if (result.Services.HasEntertainmentServicesNearby)
+                $("#edit-estate-hasentertainmentnearby").addClass('tag-clicked');
+            if (result.Services.HasMailDepotNearby)
+                $("#edit-estate-hasmaildepotnearby").addClass('tag-clicked');                
+            if (result.Services.HasBankNearby)
+                $("#edit-estate-hasbanknearby").addClass('tag-clicked');
 
         }
 
@@ -837,93 +1070,110 @@ $(document).on('click', '#edit-estate-confirm-btn', function() {
 
                     Id : +estateId,
                     Price : +$("#edit-estate-price").val(),
-                    SquareFeet : +$("#edit-estate-squarefeet").val(),
-                    Category : $("#edit-estate-category").val(),
-                    BuiltAt : $("#edit-estate-builtat").val() + '-01-01',
-                    RefurbishedAt : $("#edit-estate-refurbishedat").val() + '-01-01',
-                    Grade : $("#edit-estate-quality").val(),
-                    Room : +$("#edit-estate-roomcount").val(),
-                    Kitchen : +$("#edit-estate-kitchencount").val(),
-                    Bathroom : +$("#edit-estate-bathroomcount").val(),
+                    TotalSquareFeet : +$("#edit-estate-squarefeet").val(),
+                    LandSquareFeet : +$("#edit-estate-propertysquarefeet").val(),
+                    RoomCount : +$("#edit-estate-roomcount").val(),
+                    KitchenCount : +$("#edit-estate-kitchencount").val(),
+                    BathroomCount : +$("#edit-estate-bathroomcount").val(),
                     FloorCount : +$("#edit-estate-floorcount").val(),
-                    Garage : +$("#edit-estate-hasgarage").val(),
-                    Elevator : +$("#edit-estate-haselevator").val(),
-                    Garden : +$("#edit-estate-hasgarden").val(),
-                    Terace : +$("#edit-estate-hasterrace").val(),
-                    PropertySquareFeet : +$("#edit-estate-propertysquarefeet").val(),
                     GarageSquareFeet : +$("#edit-estate-garagesquarefeet").val(),
                     GardenSquareFeet : +$("#edit-estate-gardensquarefeet").val(),
                     TerraceSquareFeet : +$("#edit-estate-terracesquarefeet").val(),
-                    Basement : +$("#edit-estate-hasbasement").val(),
-                    Comfort : +$("#edit-estate-hascomfort").val(),
+                    
+                    BuiltAt : $("#edit-estate-builtat").val() + '-01-01',
+                    RefurbishedAt : $("#edit-estate-refurbishedat").val() + '-01-01',    // TODO
+
+                    HasElevator : $("#edit-estate-haselevator").attr('value'),
+                    HasGarden : $("#edit-estate-hasgarden").attr('value'),
+                    HasGarage : $("#edit-estate-hasgarage").attr('value'),
+                    HasDisabledFriendly : $("#edit-estate-disabilityfriendly").attr('value'),
+                    HasInnerHeightGreatherThan3Meters : $("#edit-estate-innerheightgreaterthan3meters").attr('value'),
+                    HasSeparateWcAndBathroom : $("#edit-estate-hasseparatebathandtoilet").attr('value'),
+                    HasParticipatedInThePanelProgram : $("#edit-estate-haspanelprogramparticipation").attr('value'),
+                    HasHeatIsolated : $("#edit-estate-hasheatisolation").attr('value'),
+                    HasTerace : $("#edit-estate-hasterrace").attr('value'),
+                    HasBasement : $("#edit-estate-hasbasement").attr('value'),
+
+                    Roof : $("#edit-estate-roof").val(),
+                    Comfort : $("#edit-estate-comfort").val(),
+                    Outlook : $("#edit-estate-view").val(),
+                    Area : $("#edit-estate-area").val(),
+                    Quality : $("#edit-estate-quality").val(),
+                    Category : $("#edit-estate-category").val(),
                     AdvertiserId : advertiserId
                 },
         
                 Address : {
 
                     Id : 0,
+                    FloorNumber : $("#edit-estate-floorcount").val(),
+                    EstateId : +estateId,
+                    
                     Country : $("#edit-estate-country").val(),
                     County : $("#edit-estate-county").val(),
                     City : $("#edit-estate-city").val(),
                     PostCode : $("#edit-estate-postcode").val(),
                     Street : $("#edit-estate-street").val(),
                     HouseNumber : $("#edit-estate-housenumber").val(),
-                    Door : $("#edit-estate-door").val(),
-                    FloorNumber : +$("#edit-estate-floor").val(),
-                    EstateId : +estateId
+                    Door : $("#edit-estate-door").val()
                 },
         
                 Electricity : {
 
                     Id : 0,
-                    SunCollector : +$("#edit-estate-hassuncollector").val(),
-                    Thermal : 0,
-                    Networked : 1,
-                    EstateId : +estateId
+                    EstateId : +estateId,
+                    
+                    SunCollector : $("#edit-estate-hassuncollector").attr('value'),
+                    PowerWall : $("#edit-estate-haspowerwall").attr('value'),
+                    Networked : $("#edit-estate-networkedelectricity").attr('value'),
                 },
         
                 Heating : {
 
-                    Id : 0,
-                    ByWood : +$("#edit-estate-haswoodenheating").val(),
-                    ByRemote : +$("#edit-estate-hasremoteheating").val(),
-                    ByGas : +$("#edit-estate-hasgasheating").val(),
-                    ByElectricity : +$("#edit-estate-haselectricityheating").val(),
-                    FloorHeating : +$("#edit-estate-hasfloorheating").val(),
-                    EstateId : +estateId 
+                    Id : 0,       
+                    EstateId : +estateId,
+
+                    ByCirculation : $("#edit-estate-hascirculation").attr('value'),
+                    ByGasConvector : $("#edit-estate-hasconvector").attr('value'),
+                    ByGas : $("#edit-estate-hasgasheating").attr('value'),
+                    ByWood : $("#edit-estate-haswoodenheating").attr('value'),
+                    ByCombined : $("#edit-estate-hascombinedheating").attr('value'),
+                    ByChimney : $("#edit-estate-haschimneyheating").attr('value'),
+                    ByCockle : $("#edit-estate-hascockleheating").attr('value'),
+                    ByRemote : $("#edit-estate-hasremoteheating").attr('value'),
+                    ByNetworked : $("#edit-estate-hasgasremote").attr('value'),
+                    ByElectricity : $("#edit-estate-haselectricityheating").attr('value'),
+                    ByFloorHeating : $("#edit-estate-hasfloorheating").attr('value')
                 },
         
                 PublicService : {
 
                     Id : 0,
-                    Grocery : +$("#edit-estate-hasgrocerynearby").val(),
-                    GasStation : +$("#edit-estate-haspetrolstationnearby").val(),
-                    Transport : +$("#edit-estate-haspublictransportnearby").val(),
-                    DrugStore : +$("#edit-estate-hashaspharmacynearby").val(),
-                    School : +$("#edit-estate-hasschoolnearby").val(),
-                    MailDepot : +$("#edit-estate-hasmaildepotnearby").val(),
-                    Bank : +$("#edit-estate-hasbanknearby").val(),
-                    EstateId : +estateId 
-                },
-        
-                Water : {
-
-                    Id : 0,
-                    AvailabilityType : "Csatornázott",
-                    EstateId : +estateId
+                    EstateId : +estateId,
+                    
+                    HasGroceryNearby : $("#edit-estate-hasgrocerynearby").attr('value'),
+                    HasGasStationNearby : $("#edit-estate-haspetrolstationnearby").attr('value'),
+                    HasTransportNearby : $("#edit-estate-haspublictransportnearby").attr('value'),
+                    HasDrugStoreNearby : $("#edit-estate-hashaspharmacynearby").attr('value'),
+                    HasSchoolNearby : $("#edit-estate-hasschoolnearby").attr('value'),
+                    HasMailDepotNearby : $("#edit-estate-hasmaildepotnearby").attr('value'),
+                    HasBankNearby : $("#edit-estate-hasbanknearby").attr('value'),
+                    HasEntertainmentServicesNearby : $("#edit-estate-hasentertainmentnearby").attr('value')
                 },
         
                 Advertisement : {
 
                     Id : 0,
-                    TimePosted : updateTime.getFullYear() + '-' + updateTime.getMonth() + '-' + updateTime.getDate(),
+                    OrderOfAppearance : +$('#edit-estate-priority').val(),
+                    EstateId : +estateId,
+                    
+                    TimePosted : creationTime.getFullYear() + '-' + creationTime.getMonth() + '-' + creationTime.getDay(),
+                    LastModification : null,
+
                     Title : $("#edit-estate-adtitle").val(),
                     DescriptionDetail : $("#edit-estate-addescr").val(),
-                    LastModification : updateTime.getFullYear() + '-' + updateTime.getMonth() + '-' + updateTime.getDate(),
-                    OrderOfAppearance : null,
                     OfferType : $("#edit-estate-adtype").val(),
-                    EstateId : +estateId,
-                    AdvertiserId : advertiserId 
+                    AdvertiserId : advertiserId
                 } 
             };            
 

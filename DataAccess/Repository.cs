@@ -1,19 +1,29 @@
-using backend.DataAccess.Entities;
-using backend.DataAccess.Entities.Identity;
+using DunakanyarHouseIngatlan.DataAccess.Entities;
+using DunakanyarHouseIngatlan.DataAccess.Entities.Identity;
 
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 
 
-namespace backend.DataAccess
+namespace DunakanyarHouseIngatlan.DataAccess
 {
     public class Repository : IRepository
     {
         private JenniferEstateContext ctx;
+        
         public Repository()
         {
             ctx = new JenniferEstateContext(Startup.ctxOptionsBuilder.Options);
+        }
+
+        public int CountEstates()
+        {
+            int result = -1;
+
+            result = ctx.Estate.Count();
+
+            return result;
         }
 
         public List<Address> GetAddresses() => ctx.Address.ToList();
@@ -55,18 +65,6 @@ namespace backend.DataAccess
 
             return result;                
         }
-        public WaterSystem GetWaterSystem(int estateId)
-        {
-            WaterSystem result = null;
-
-            var water = ctx.WaterSystem.Select(w => w)
-                             .Where(w => w.EstateId == estateId);
-                             
-            if (water.Count() > 0)
-                result = water.FirstOrDefault();
-
-            return result;                
-        }
 
         public PublicService GetPublicService(int estateId) 
         {
@@ -81,6 +79,8 @@ namespace backend.DataAccess
             return result;                
         }
 
+        // Adott id-jú ingatlan  lekérdezése.
+        //
         public Estate GetEstate(int estateId)
         {
             Estate result = null;
@@ -94,11 +94,37 @@ namespace backend.DataAccess
             return result;                
         }
 
-        public List<Estate> GetEstates(int from, int limit)
+        // Adott Id-tól felmenőleg lekérdezi az ingatlanokat. 
+        // Legfeljebb 50-et lehet lekérdezni egyszerre.
+        //
+        public List<Estate> GetEstates(int? fromId, int limit)
         {
-            List<Estate> result = ctx.Estate.Select(e => e)
-                                            .Where(e => e.Id >= from)
-                                            .Take(limit).ToList();
+            List<Estate> result = new List<Estate>();
+            int max = 20;
+
+            if (limit > max || limit <= 0)
+                limit = max;
+            if (fromId == null) {
+                result = ctx.Estate.Select(e => e).Take(limit).ToList();
+            }
+            else {
+                Estate item = ctx.Estate.Where(e => e.Id == fromId).FirstOrDefault();
+                if (item == null)
+                    result = ctx.Estate.Select(e => e).Take(limit).ToList();
+                else {
+                    bool found = false;
+                    int took = 0;
+                    foreach (Estate entry in ctx.Estate) {
+                        if (entry.Id == fromId) {
+                            found = true;
+                        }
+                        if (found && took < limit) {
+                            result.Add(entry);
+                            ++took;
+                        }
+                    }
+                }
+            }
 
             return result;    
         }
@@ -141,22 +167,7 @@ namespace backend.DataAccess
 
             var result = new List<Estate>();
 
-            var estates = GetEstatesSimpleCriteria(estateType, minPrice, maxPrice, city).Select(s => s)
-                     .Where(e => (e.SquareFeet >= minSquareFeet && e.SquareFeet <= maxSquareFeet) ||
-                                 (e.BuiltAt >= minBuiltAt && e.BuiltAt <= maxBuiltAt) ||
-                                 (e.Grade.ToUpper() == grade.ToUpper()) ||
-                                 (e.Room == roomCount) ||
-                                 (e.Kitchen == kitchenCount) ||
-                                 (e.Bathroom == bathroomCount) ||
-                                 (e.FloorCount == floors) ||
-                                 ((e.RefurbishedAt == null ? false : true) == refurbished) ||
-                                 (e.Garage == (garage ? 1 : 0)) ||
-                                 (e.Elevator == (elevator ? 1 : 0)) ||
-                                 (e.Garden == (garden ? 1 : 0)) ||
-                                 (e.Terace == (terace ? 1 : 0)) || 
-                                 (e.Basement == (basement ? 1 : 0))
-                     ).ToList();
-
+           
             // TODO
 
 
@@ -198,7 +209,7 @@ namespace backend.DataAccess
             return result;
         }
         public List<Popularity> GetPopularities() => ctx.Popularity.ToList();
-        public List<WaterSystem> GetWaterSystems() => ctx.WaterSystem.ToList();
+        
 
         public byte[] GetImage(int imageId) 
         {
@@ -250,52 +261,40 @@ namespace backend.DataAccess
             return result;
         }
 
-        public CompanyDetails GetCompanyDetails() => ctx.CompanyDetails.First();
-
-        public bool CheckInvitationStatus(Invitation invitation)
-        {
-            bool success = false;
-
-            success = ctx.Invitation.Select(i => i)
-                                    .Any(i => (i.Id == invitation.Id) && (i.Expired == 0));
-
-            return success;
-        }
-
-        public void InvalidateInvitationTicket(string invitationId)
-        {
-            Invitation invitation = ctx.Invitation.Select(i => i).Where(i => i.Id == invitationId).First();
-            invitation.Expired = 1;
-
-            ctx.SaveChanges();
-        }
-
         public void UpdateEstate(Estate estate)
         {
             var toUpdate = ctx.Estate.Select(e => e)
                                      .Where(e => e.Id == estate.Id)
                                      .First();
                                      
-            toUpdate.SquareFeet = estate.SquareFeet;
+            toUpdate.Area = estate.Area;
+            toUpdate.HasDisabledFriendly = estate.HasDisabledFriendly;
+            toUpdate.HasHeatIsolated = estate.HasHeatIsolated;
+            toUpdate.HasInnerHeightGreatherThan3Meters = estate.HasInnerHeightGreatherThan3Meters;
+            toUpdate.HasParticipatedInThePanelProgram = estate.HasParticipatedInThePanelProgram;
+            toUpdate.HasSeparateWcAndBathroom = estate.HasSeparateWcAndBathroom;
+            toUpdate.Outlook = estate.Outlook;
+            toUpdate.Roof = estate.Roof;                                     
+            toUpdate.TotalSquareFeet = estate.TotalSquareFeet;
+            toUpdate.LandSquareFeet = estate.LandSquareFeet;
             toUpdate.Category = estate.Category;
             toUpdate.BuiltAt = estate.BuiltAt;
             toUpdate.RefurbishedAt = estate.RefurbishedAt;
-            toUpdate.Grade = estate.Grade;
-            toUpdate.Room = estate.Room;
-            toUpdate.Kitchen = estate.Kitchen;
-            toUpdate.Bathroom = estate.Bathroom;
+            toUpdate.Quality = estate.Quality;
+            toUpdate.RoomCount = estate.RoomCount;
+            toUpdate.KitchenCount = estate.KitchenCount;
+            toUpdate.BathroomCount = estate.BathroomCount;
             toUpdate.FloorCount = estate.FloorCount;
-            toUpdate.Garage = estate.Garage;
-            toUpdate.Elevator = estate.Elevator;
-            toUpdate.Terace = estate.Terace;
-            toUpdate.PropertySquareFeet = estate.PropertySquareFeet;
-            toUpdate.GarageSquareFeet = estate.GarageSquareFeet ?? 0;
-            toUpdate.GardenSquareFeet = estate.GardenSquareFeet ?? 0;
-            toUpdate.TerraceSquareFeet = estate.TerraceSquareFeet ?? 0;
-            toUpdate.Basement = estate.Basement;
+            toUpdate.GarageSquareFeet = estate.GarageSquareFeet;
+            toUpdate.HasElevator = estate.HasElevator;
+            toUpdate.HasTerace = estate.HasTerace;
+            toUpdate.GarageSquareFeet = estate.GarageSquareFeet;
+            toUpdate.GardenSquareFeet = estate.GardenSquareFeet;
+            toUpdate.TerraceSquareFeet = estate.TerraceSquareFeet;
+            toUpdate.HasBasement = estate.HasBasement;
             toUpdate.Comfort = estate.Comfort;
             toUpdate.AdvertiserId = estate.AdvertiserId;
-            toUpdate.Garden = estate.Garden;
+            toUpdate.GardenSquareFeet = estate.GardenSquareFeet;
             toUpdate.Price = estate.Price;
 
             ctx.SaveChanges();
@@ -327,7 +326,7 @@ namespace backend.DataAccess
 
             toUpdate.Networked = electricity.Networked;
             toUpdate.SunCollector = electricity.SunCollector;
-            toUpdate.Thermal = electricity.Thermal;
+            toUpdate.PowerWall = electricity.PowerWall;
         }
         
         public void UpdateHeatingSystem(HeatingSystem heating)
@@ -336,7 +335,7 @@ namespace backend.DataAccess
                                             .Where(h => h.EstateId == heating.EstateId)
                                             .First();
 
-            toUpdate.FloorHeating = heating.FloorHeating;
+            toUpdate.ByFloorHeating = heating.ByFloorHeating;
             toUpdate.ByWood = heating.ByWood;
             toUpdate.ByRemote = heating.ByRemote;
             toUpdate.ByGas = heating.ByGas;
@@ -351,24 +350,14 @@ namespace backend.DataAccess
                                             .Where(p => p.EstateId == publicService.EstateId)
                                             .First();
 
-            toUpdate.Bank = publicService.Bank;
-            toUpdate.DrugStore = publicService.DrugStore;
-            toUpdate.GasStation = publicService.GasStation;
-            toUpdate.Grocery = publicService.Grocery;
-            toUpdate.MailDepot = publicService.MailDepot;
-            toUpdate.Transport = publicService.Transport;
-            toUpdate.School = publicService.School;
-
-            ctx.SaveChanges();
-        }
-        
-        public void UpdateWaterSystem(WaterSystem waterSystem)
-        {
-            var toUpdate = ctx.WaterSystem.Select(w => w)
-                                          .Where(w => w.EstateId == waterSystem.EstateId)
-                                          .First();
-
-            toUpdate.AvailabilityType = waterSystem.AvailabilityType;
+            toUpdate.HasBankNearby = publicService.HasBankNearby;
+            toUpdate.HasDrugStoreNearby = publicService.HasDrugStoreNearby;
+            toUpdate.HasGasStationNearby = publicService.HasGasStationNearby;
+            toUpdate.HasGroceryNearby = publicService.HasGroceryNearby;
+            toUpdate.HasMailDepotNearby = publicService.HasMailDepotNearby;
+            toUpdate.HasTransportNearby = publicService.HasTransportNearby;
+            toUpdate.HasSchoolNearby = publicService.HasSchoolNearby;
+            toUpdate.HasEntertainmentServicesNearby = publicService.HasEntertainmentServicesNearby;
 
             ctx.SaveChanges();
         }
@@ -430,13 +419,6 @@ namespace backend.DataAccess
             ctx.SaveChanges();
         }
 
-        public void AddWaterSystem(WaterSystem waterSystem, int estateId)
-        {
-            waterSystem.EstateId = estateId;
-            ctx.WaterSystem.Add(waterSystem);
-            ctx.SaveChanges();
-        }
-
         public void AddAdvertisement(Advertisement advertisement, int estateId, string advertiserId)
         {
             advertisement.EstateId = estateId;
@@ -452,12 +434,6 @@ namespace backend.DataAccess
             var advertisement = GetAdvertisement(estateId);
             if (advertisement != null) {
                 ctx.Advertisement.Remove(advertisement);
-                ctx.SaveChanges();
-            }
-
-            var waterSystem = GetWaterSystem(estateId);
-            if (waterSystem != null) {
-                ctx.WaterSystem.Remove(waterSystem);
                 ctx.SaveChanges();
             }
 
@@ -511,13 +487,6 @@ namespace backend.DataAccess
             return success;
         }
 
-        public void AddInvitation(string inviteeId) 
-        {
-            var inv = new Invitation();
-            ctx.Invitation.Add(inv);
-            ctx.SaveChanges();
-        }
-
         public bool AddImage(GenericImage image)
         {
             bool success = false;
@@ -540,9 +509,6 @@ namespace backend.DataAccess
         public bool DeleteEmployee(string employeeId)
         {
             bool success = false;
-
-            // Need to assign the related advertisements among the remaining employees.
-            //
 
             // TODO
             

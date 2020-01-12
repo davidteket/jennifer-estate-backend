@@ -1,17 +1,26 @@
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
-using backend.Services;
-using backend.Models;
-using backend.DataAccess;
+using DunakanyarHouseIngatlan.Services;
+using DunakanyarHouseIngatlan.Models;
+using DunakanyarHouseIngatlan.DataAccess;
 
-namespace backend.Controllers
+namespace DunakanyarHouseIngatlan.Controllers
 {
     public class Application : Controller
     {
-        private IRepository _repo = new Repository();
-        private Serializer _serializer = new Serializer();
+        private IRepository _repo;
+        private Serializer _serializer;
 
+        public Application(IRepository implementation)
+        {
+            _serializer = new Serializer();
+            _repo = implementation;
+        }
+        
+        // Az alkalmazás  gyári beállításainak visszaállítása valamint a letárolt adatok végleges törlése.
+        // Ez a művelet csak root jogosultságú felhasználóval hajtható végre.
+        //
         [HttpGet]
         public string FactoryReset()
         {
@@ -30,24 +39,20 @@ namespace backend.Controllers
                     if (success) {
                         response.Success = true;
                         response.Message = _serializer.GetServerLogMessage("ApplicationDataErease");
-                        // LOG - green
                     }
                     else {
                         response.Success = false;
                         response.Message = _serializer.GetServerLogMessage("ApplicationDataEreaseError");
-                        // LOG - red
                     }
                 }
                 else {
                     response.Success = false;
                     response.Message = _serializer.GetServerLogMessage("EmployeeRoleNotHighEnough");
-                    // LOG - yellow
                 }
             }
             else {
                 response.Success = false;
                 response.Message = _serializer.GetServerLogMessage("EmployeeRetrievalError");
-                // LOG - red
             }
 
             return JsonConvert.SerializeObject(response);

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using backend.DataAccess.Entities;
+using DunakanyarHouseIngatlan.DataAccess.Entities;
 
-namespace backend.Models
+namespace DunakanyarHouseIngatlan.Models
 {
     public class EstateDetailsViewModel
     {
@@ -9,7 +9,6 @@ namespace backend.Models
             public Electricity Electricity { get; set; }
             public HeatingSystem Heating { get; set; }
             public Address Address { get; set; }
-            public WaterSystem Water { get; set; }
             public PublicService Services { get; set; }
             public Advertisement Advertisement { get; set; }
             public List<GenericImage> Images { get; set; }

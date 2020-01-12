@@ -1,7 +1,7 @@
-using backend.DataAccess.Entities.Identity;
+using DunakanyarHouseIngatlan.DataAccess.Entities.Identity;
 using Microsoft.AspNetCore.Identity;
 
-namespace backend.DataAccess
+namespace DunakanyarHouseIngatlan.DataAccess
 {
     public class DataAccessWrapper
     {
